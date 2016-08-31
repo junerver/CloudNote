@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.junerver.cloudnote">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <!--
+       configChanges参数的作用是不让activity重启
+       3.2之前的sdk只需要配置前面两个值:keyboardHidden|orientation
+       3.2之后的sdk必须配置三个值keyboardHidden|orientation|screensize
+    -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,13 +18,22 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.activity.MainActivity"
-            android:label="@string/title_activity_main"
+            android:label="@string/title_activity_main">
+        </activity>
+        <activity
+            android:name=".ui.activity.SplashActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:noHistory="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".ui.activity.LoginActivity">
+        </activity>
+        <activity android:name=".ui.activity.RegisterActivity">
         </activity>
     </application>
 

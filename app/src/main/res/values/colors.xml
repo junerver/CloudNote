@@ -3,4 +3,21 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="lightgrey">#DBDBDB</color>
+    <color name="heightgrey">#CDC9C9</color>
+    <color name="gray">#B5B5B5</color>
+    <color name="blue">#01ffde</color>
+    <color name="green">#43CD80</color>
+    <color name="deepgreen">#39BEB4</color>
+    <color name="backgroundcolor">#f0f0f0</color>
+    <color name="shallowgray">#e1e1e1</color>
+    <color name="textgray">#A39898</color>
+    <color name="shallowgreen">#C9EAE8</color>
+    <color name="transparentgray">#53756E60</color>
+    <color name="transparent_background">#50000000</color>
+    <color name="popup_main_background">#b0000000</color>
+    <color name="orange">#FF9900</color>
+    <color name="greyblue">#436EEE</color>
 </resources>
