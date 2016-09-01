@@ -1,85 +1,57 @@
 package com.junerver.cloudnote.ui.activity;
 
-import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
-import com.junerver.cloudnote.Constants;
 import com.junerver.cloudnote.R;
-import com.junerver.cloudnote.observable.LoginRegisterObservable;
-import com.junerver.cloudnote.utils.SPUtils;
-import com.zhy.http.okhttp.utils.L;
 
-import rx.Observer;
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
 
-public class SplashActivity extends BaseActivity implements Observer<String> {
+public class SplashActivity extends AppCompatActivity {
 
+    private static final String APPID = "0864d7f88908062c99fe51c58c65f254";
 
     @Override
-    protected void initView() {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // 初始化 Bmob SDK
+        // 使用时请将第二个参数Application ID替换成你在Bmob服务器端创建的Application ID
+        Bmob.initialize(this, APPID);
+        setContentView(R.layout.activity_splash);
+
+//		// 使用推送服务时的初始化操作
+//		BmobInstallation.getCurrentInstallation(this).save();
+//		// 启动推送服务
+//		BmobPush.startWork(this, APPID);
         //一个延时跳转效果
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                isFirstRun(mContext);
+                isFirstRun();
                 SplashActivity.this.finish();
             }
         }, 1000);
     }
 
-    @Override
-    protected void initData() {
 
-    }
+    public void isFirstRun() {
 
-    @Override
-    protected void setListeners() {
-
-    }
-
-    @Override
-    protected int getLayoutId() {
-        return R.layout.activity_splash;
-    }
-
-    public void isFirstRun(Context context) {
-        boolean isFirstRun= (boolean) SPUtils.get(context, "isFirstRun", true);
-        if (isFirstRun) {
-            //第一次运行打开登录界面
-            startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-        }else {
-            //不是第一次运行，找到SP文件中的用户名密码
-            String loginedUsername = (String) SPUtils.get(context, "loginedUsername", "");
-            String loginedPassword = (String) SPUtils.get(context, "loginedPassword", "");
-            //使用最后一次保存的用户名密码访问服务器验证，
-
-            // TODO: 2016/8/31  通过服务器验证账密是否正确并返回值
-            LoginRegisterObservable.getObservable(Constants.GET_LOGIN,loginedUsername,loginedPassword)
-                    .subscribe(this);
-
-        }
-    }
-
-    @Override
-    public void onCompleted() {
-
-    }
-
-    @Override
-    public void onError(Throwable e) {
-
-    }
-
-    @Override
-    public void onNext(String s) {
-
-        if (s=="1") {
-            //通过跳转主页面
+        //获取本地磁盘缓存的用户信息
+        BmobUser bmobUser = BmobUser.getCurrentUser();
+        if (bmobUser != null) {
+            // 允许用户使用应用
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
         } else {
-            //如果不通过则停留在登录页面，并且toast提示！
+            //缓存用户对象为空时， 可打开用户登录注册界面…
             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-            showShortToast("用户名或密码错误！！！");
         }
     }
+
+
 }

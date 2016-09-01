@@ -7,16 +7,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.junerver.cloudnote.Constants;
 import com.junerver.cloudnote.R;
-import com.junerver.cloudnote.observable.LoginRegisterObservable;
+import com.junerver.cloudnote.utils.NetUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observer;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
 
-public class LoginActivity extends BaseActivity implements Observer<String>{
+public class LoginActivity extends BaseActivity{
 
     @BindView(R.id.etLoginUsername)
     EditText mEtLoginUsername;
@@ -35,7 +36,7 @@ public class LoginActivity extends BaseActivity implements Observer<String>{
 
     @Override
     protected void initView() {
-        ButterKnife.bind(this);
+
     }
 
     @Override
@@ -59,45 +60,41 @@ public class LoginActivity extends BaseActivity implements Observer<String>{
             case R.id.btnLogin:
                 mLoginUsername =mEtLoginUsername.getText().toString().trim();
                 mLoginPassword =mEtLoginPassword.getText().toString().trim();
+
                 //都不是空
-                if (TextUtils.isEmpty(mLoginUsername)) {
+                if (!NetUtils.isConnected(mContext)) {
+                    showShortToast("没有网络连接！！！");
+                }else if (TextUtils.isEmpty(mLoginUsername)) {
                     mEtLoginUsername.requestFocus();
                     mEtLoginUsername.setError("对不起，用户名不能为空");
                     return;
-                }
-                if (TextUtils.isEmpty(mLoginPassword)){
+                } else if (TextUtils.isEmpty(mLoginPassword)) {
                     mEtLoginPassword.requestFocus();
                     mEtLoginPassword.setError("对不起，用密码不能为空");
                     return;
+                } else {
+                    showProgress();
+                    BmobUser bmobUser = new BmobUser();
+                    bmobUser.setUsername(mLoginUsername);
+                    bmobUser.setPassword(mLoginPassword);
+                    bmobUser.login( new SaveListener<BmobUser>() {
+                        @Override
+                        public void done(BmobUser bmobUser, BmobException e) {
+                            closeProgress();
+                            if(e==null){
+                                //进入主页面
+                                startActivity(new Intent(mContext,MainActivity.class));
+                            }else{
+                                showShortToast("用户名或者密码错误！！！");
+                            }
+                        }
+                    });
                 }
-                // TODO: 2016/8/31  通过服务器验证 然后跳转页面
-                showProgress();
-                LoginRegisterObservable.getObservable(Constants.GET_LOGIN,mLoginUsername,mLoginPassword)
-                        .subscribe(this);
                 break;
             case R.id.tvRegister:
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                startActivity(new Intent(mContext, RegisterActivity.class));
                 break;
         }
     }
 
-    @Override
-    public void onCompleted() {
-
-    }
-
-    @Override
-    public void onError(Throwable e) {
-        closeProgress();
-    }
-
-    @Override
-    public void onNext(String s) {
-        closeProgress();
-        if (s == "1") {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-        } else {
-            showShortToast("用户名或密码错误");
-        }
-    }
 }

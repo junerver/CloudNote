@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 
+import butterknife.ButterKnife;
+
 /**
  * Created by Junerver on 2016/8/31.
  */
@@ -26,6 +28,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             throw new IllegalStateException("Please specify root layout resource id for " + getClass().getSimpleName());
         } else {
             setContentView(layout);
+            ButterKnife.bind(this);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mProgressDialog = new ProgressDialog(this, android.R.style.Theme_Material_Light_Dialog_Alert);
             } else {
@@ -36,7 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             initView();
             setListeners();
             //注册事件总线
-            EventBus.getDefault().register(this);
+//            EventBus.getDefault().register(this);
         }
 
     }
@@ -45,7 +48,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         //注销事件总线
-        EventBus.getDefault().unregister(this);
+//        EventBus.getDefault().unregister(this);
     }
 
     /**
