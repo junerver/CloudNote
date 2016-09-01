@@ -15,14 +15,12 @@ import cn.bmob.v3.listener.SaveListener;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final String APPID = "0864d7f88908062c99fe51c58c65f254";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 初始化 Bmob SDK
-        // 使用时请将第二个参数Application ID替换成你在Bmob服务器端创建的Application ID
-        Bmob.initialize(this, APPID);
+
         setContentView(R.layout.activity_splash);
 
 //		// 使用推送服务时的初始化操作
