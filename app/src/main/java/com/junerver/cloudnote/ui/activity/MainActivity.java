@@ -12,12 +12,15 @@ import com.junerver.cloudnote.db.entity.Note;
 import com.junerver.cloudnote.db.entity.NoteEntity;
 
 import java.security.acl.NotOwnerException;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 
 public class MainActivity extends BaseActivity {
@@ -69,14 +72,16 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.btnSubmit)
     public void onClick() {
-        final String title = mEtTitle.getText().toString().trim();
-        final String content = mEtContent.getText().toString().trim();
-        final String summary;
+        String title = mEtTitle.getText().toString().trim();
+        String content = mEtContent.getText().toString().trim();
+        String summary;
         if (content.length() >= 10) {
             summary = content.substring(0, 9);
         } else {
             summary = content;
         }
+
+
 
         final Note note = new Note();
         note.setTitle(title);
@@ -86,9 +91,25 @@ public class MainActivity extends BaseActivity {
             @Override
             public void done(String objectId, BmobException e) {
                 if(e==null){
-                    Log.d("tag","创建数据成功：" + objectId+"   data:"+note.getUpdatedAt()+"    "+note.getCreatedAt());
-                    NoteEntity noteEntity = new NoteEntity(title, summary, content, note.getCreatedAt(), note.getObjectId());
-                    CloudNoteApp.getNoteEntityDao().insert(noteEntity);
+                    BmobQuery<Note> query = new BmobQuery<Note>();
+                    query.getObject(objectId, new QueryListener<Note>() {
+                        @Override
+                        public void done(Note object, BmobException e) {
+                            if(e==null){
+                                NoteEntity noteEntity = new NoteEntity();
+                                noteEntity.setId(new Date().getTime());
+                                noteEntity.setTitle(object.getTitle());
+                                noteEntity.setContent(object.getContent());
+                                noteEntity.setSummary(object.getSummary());
+                                noteEntity.setObjId(object.getObjectId());
+                                noteEntity.setDate(object.getUpdatedAt());
+                                CloudNoteApp.getNoteEntityDao().insert(noteEntity);
+                            }else{
+                                Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                            }
+                        }
+
+                    });
                 }else{
                     Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
                 }

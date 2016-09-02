@@ -25,8 +25,8 @@ public class NoteEntity{
      *
      */
 
-    @Id
-    private long id;        //本地数据库id
+    @Id(autoincrement = true)
+    private long id;        //本地数据库id 自增长
 
     @Property(nameInDb = "TITLE")
     private String title;       //标题
@@ -41,7 +41,7 @@ public class NoteEntity{
     private String date;   //更新日期
 
     @Property(nameInDb = "OBJ_ID")
-    private String objId;   //保存bmob云实体
+    private String objId;   //保存bmob云实体id（用于查询bmob对象）
 
     @Transient
     private long unix_time=0L;
@@ -106,6 +106,7 @@ public class NoteEntity{
     }
 
     public NoteEntity(String title, String summary, String content, String date, String objId) {
+        this.id = new Date().getTime();
         this.title = title;
         this.summary = summary;
         this.content = content;
