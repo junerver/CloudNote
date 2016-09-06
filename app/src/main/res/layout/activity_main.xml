@@ -1,42 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:orientation="vertical"
-    android:fitsSystemWindows="true"
     tools:context="com.junerver.cloudnote.ui.activity.MainActivity">
 
-
-    <TextView
+    <android.support.v4.view.ViewPager
+        android:id="@+id/id_view_pager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tvUsername"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/etTitle"/>
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/etContent"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnSubmit"
-        android:text="保存"/>
+        android:layout_weight="1"
+        >
+    </android.support.v4.view.ViewPager>
 
 
+<com.junerver.cloudnote.ui.widget.TabView
+    android:id="@+id/id_tab"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#eeeeee"
+    app:text_size="12sp"
+    app:text_normal_color="#ff777777"
+    app:text_select_color="#0099CC"
+    app:item_padding="7dp"
+    android:layout_alignParentBottom="true">
+
+</com.junerver.cloudnote.ui.widget.TabView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email"/>
+        android:src="@drawable/menu_add_note"
+        app:backgroundTint="#1BCC5A"
+        android:layout_marginRight="34dp"
+        android:layout_marginBottom="43dp"
+        android:layout_marginEnd="34dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 
-</LinearLayout>
+</RelativeLayout>
