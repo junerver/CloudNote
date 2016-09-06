@@ -83,7 +83,7 @@ public class MainActivity extends BaseActivity {
 
 
 
-        final Note note = new Note();
+        Note note = new Note();
         note.setTitle(title);
         note.setContent(content);
         note.setSummary(summary);
