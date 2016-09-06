@@ -84,6 +84,7 @@ public class LoginActivity extends BaseActivity{
                             if(e==null){
                                 //进入主页面
                                 startActivity(new Intent(mContext,MainActivity.class));
+                                LoginActivity.this.finish();
                             }else{
                                 showShortToast("用户名或者密码错误！！！");
                             }

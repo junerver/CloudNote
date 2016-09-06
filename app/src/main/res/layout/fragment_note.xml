@@ -8,40 +8,44 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="@dimen/tool_bar_height"
         android:background="@color/greyblue">
         <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/tool_bar_item_icon_height"
+            android:layout_height="@dimen/tool_bar_item_icon_height"
             android:layout_gravity="center_vertical"
-            android:paddingLeft="10dp"
+            android:paddingLeft="@dimen/tool_bar_item_icon_padding"
             android:src="@drawable/ic_account_circle_white_48dp"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:id="@+id/imageView"/>
+            android:id="@+id/ivMine"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30dp"
+            android:textSize="@dimen/tool_bar_text_size"
             android:textColor="@android:color/white"
             android:text="笔记"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/textView"/>
+            android:id="@+id/tvNote"/>
         <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/tool_bar_item_icon_height"
+            android:layout_height="@dimen/tool_bar_item_icon_height"
             android:src="@drawable/ic_sync_white_48dp"
-            android:layout_alignTop="@+id/imageView"
+            android:layout_alignTop="@+id/ivMine"
             android:layout_alignParentRight="true"
-            android:paddingRight="10dp"
-            android:layout_alignParentEnd="true"/>
+            android:paddingRight="@dimen/tool_bar_item_icon_padding"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/ivSync"/>
     </RelativeLayout>
 
-    <TextView
+    <com.github.jdsjlzx.recyclerview.LRecyclerView
+        android:id="@+id/rvList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="note"/>
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    </com.github.jdsjlzx.recyclerview.LRecyclerView>
 
 </LinearLayout>

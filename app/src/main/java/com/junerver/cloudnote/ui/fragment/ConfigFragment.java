@@ -12,19 +12,18 @@ import com.junerver.cloudnote.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConfigFragment extends Fragment {
+public class ConfigFragment extends BaseFragment {
 
-
-    public ConfigFragment() {
-        // Required empty public constructor
-    }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_config, container, false);
+    protected void init() {
+
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_config;
     }
 
 }

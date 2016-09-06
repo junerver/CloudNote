@@ -78,6 +78,7 @@ public class RegisterActivity extends BaseActivity {
                     if(e==null){
                         showShortToast("注册成功");
                         startActivity(new Intent(mContext,MainActivity.class));
+                        RegisterActivity.this.finish();
                     }else{
                         showShortToast("注册失败！换个用户名试试吧~");
                     }

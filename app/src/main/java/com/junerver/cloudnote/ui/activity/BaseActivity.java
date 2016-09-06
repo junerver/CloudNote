@@ -29,15 +29,15 @@ public abstract class BaseActivity extends AppCompatActivity {
         } else {
             setContentView(layout);
             ButterKnife.bind(this);
+            initData();
+            initView();
+            setListeners();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mProgressDialog = new ProgressDialog(this, android.R.style.Theme_Material_Light_Dialog_Alert);
             } else {
                 mProgressDialog = new ProgressDialog(this, ProgressDialog.THEME_HOLO_LIGHT);
             }
             mProgressDialog.setMessage("请稍等...");
-            initData();
-            initView();
-            setListeners();
             //注册事件总线
 //            EventBus.getDefault().register(this);
         }
