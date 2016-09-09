@@ -41,11 +41,11 @@ public class NoteFragment extends BaseFragment {
     private NoteRecyclerAdapter mDataAdapter;
     private LinearLayoutManager mLayoutManager;
     private List<NoteEntity> mNoteEntities = new ArrayList<>();
-    private Context mContext;
+
 
     @Override
     protected void init() {
-        mContext = getActivity().getApplicationContext();
+
         mDataAdapter = new NoteRecyclerAdapter(mContext);
         mDataAdapter.setDataList(mNoteEntities);
         mLRecyclerViewAdapter = new LRecyclerViewAdapter(mContext, mDataAdapter);
@@ -84,7 +84,5 @@ public class NoteFragment extends BaseFragment {
         }
     }
 
-    private void showShortToast(String msg) {
-        Toast.makeText(mContext,msg,Toast.LENGTH_SHORT).show();
-    }
+
 }

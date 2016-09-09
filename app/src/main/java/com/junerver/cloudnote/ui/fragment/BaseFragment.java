@@ -1,6 +1,7 @@
 package com.junerver.cloudnote.ui.fragment;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.junerver.cloudnote.R;
 
@@ -17,7 +19,7 @@ import butterknife.ButterKnife;
  * A simple {@link Fragment} subclass.
  */
 public abstract class BaseFragment extends Fragment {
-
+    protected Context mContext;
 
     @Nullable
     @Override
@@ -28,6 +30,7 @@ public abstract class BaseFragment extends Fragment {
         } else {
             View parentView = inflater.inflate(layoutId, null);
             ButterKnife.bind(this, parentView);
+            mContext = getActivity().getApplicationContext();
             init();
             return parentView;
         }
@@ -43,4 +46,7 @@ public abstract class BaseFragment extends Fragment {
      */
     protected abstract int getLayoutId();
 
+    protected void showShortToast(String msg) {
+        Toast.makeText(mContext,msg,Toast.LENGTH_SHORT).show();
+    }
 }
