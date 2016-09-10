@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import cn.bmob.v3.BmobObject;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
@@ -44,7 +43,7 @@ public class NoteEntity{
     private String objId;   //保存bmob云实体id（用于查询bmob对象）
 
     @Transient
-    private long unix_time=0L;
+    private long unixTime =0L;
 
     public String getObjId() {
         return this.objId;
@@ -118,6 +117,19 @@ public class NoteEntity{
     public NoteEntity() {
     }
 
+    public long getUnixTime() {
+        if (this.unixTime == 0L) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                Date date = simpleDateFormat.parse(getDate());
+                long time = date.getTime();
+                this.unixTime = time/1000;
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return unixTime;
+    }
 
 }
 

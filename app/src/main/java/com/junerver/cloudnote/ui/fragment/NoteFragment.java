@@ -1,8 +1,9 @@
 package com.junerver.cloudnote.ui.fragment;
 
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -10,13 +11,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.github.jdsjlzx.recyclerview.LRecyclerView;
 import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
 import com.junerver.cloudnote.R;
 import com.junerver.cloudnote.adapter.NoteRecyclerAdapter;
 import com.junerver.cloudnote.db.entity.NoteEntity;
+import com.junerver.cloudnote.observable.NotesListFromDatabaseObservable;
+import com.junerver.cloudnote.ui.activity.AddNoteActivity;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +27,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observer;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class NoteFragment extends BaseFragment {
+public class NoteFragment extends BaseFragment implements Observer<List<NoteEntity>> {
 
     @BindView(R.id.ivMine)
     ImageView mIvMine;
@@ -36,6 +40,8 @@ public class NoteFragment extends BaseFragment {
     ImageView mIvSync;
     @BindView(R.id.rvList)
     LRecyclerView mRvList;
+    @BindView(R.id.fabAddNote)
+    FloatingActionButton mFabAddNote;
 
     private LRecyclerViewAdapter mLRecyclerViewAdapter;
     private NoteRecyclerAdapter mDataAdapter;
@@ -77,7 +83,7 @@ public class NoteFragment extends BaseFragment {
                 break;
             case R.id.ivSync:
                 // TODO: 2016/9/6  同步，启用observable将数据库的数据与后端数据对比并同步
-                String msg="同步中！";
+                String msg = "同步中！";
 
                 showShortToast(msg);
                 break;
@@ -85,4 +91,36 @@ public class NoteFragment extends BaseFragment {
     }
 
 
+    @OnClick(R.id.fabAddNote)
+    public void onClick() {
+        //进入添加页面
+        startActivity(new Intent(mContext, AddNoteActivity.class));
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        NotesListFromDatabaseObservable.ofDate()
+                .subscribe(this);
+    }
+
+    @Override
+    public void onCompleted() {
+        //更新配适器数据
+        Logger.d("配适器更新数据！");
+        mDataAdapter.setDataList(mNoteEntities);
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onNext(List<NoteEntity> noteEntities) {
+        //从数据库获取本地数据
+        Logger.d("fragment页面接收到数据");
+        this.mNoteEntities=noteEntities;
+    }
 }
