@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.github.jdsjlzx.interfaces.OnItemClickListener;
 import com.github.jdsjlzx.recyclerview.LRecyclerView;
 import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
 import com.junerver.cloudnote.R;
@@ -19,6 +20,7 @@ import com.junerver.cloudnote.adapter.NoteRecyclerAdapter;
 import com.junerver.cloudnote.db.entity.NoteEntity;
 import com.junerver.cloudnote.observable.NotesListFromDatabaseObservable;
 import com.junerver.cloudnote.ui.activity.AddNoteActivity;
+import com.junerver.cloudnote.ui.activity.ShowNoteActivity;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -67,6 +69,21 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
         mRvList.setLayoutManager(mLayoutManager);
         //禁用下拉刷新
         mRvList.setPullRefreshEnabled(false);
+        //设置点击事件
+        mLRecyclerViewAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int i) {
+                NoteEntity noteEntity = mDataAdapter.getDataList().get(i);
+                Intent showIntent = new Intent(mContext, ShowNoteActivity.class);
+                showIntent.putExtra("Note", noteEntity);
+                startActivity(showIntent);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int i) {
+                // TODO: 2016/9/20 可以设置长按删除
+            }
+        });
     }
 
     @Override

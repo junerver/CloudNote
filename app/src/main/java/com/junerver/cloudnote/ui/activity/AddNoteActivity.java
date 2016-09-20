@@ -58,7 +58,6 @@ public class AddNoteActivity extends BaseActivity {
     }
 
 
-
     @OnClick(R.id.btnSubmit)
     public void onClick() {
         String title = mEtTitle.getText().toString().trim();
@@ -71,20 +70,19 @@ public class AddNoteActivity extends BaseActivity {
         }
 
 
-
-        final Note note = new Note();
+        Note note = new Note();
         note.setTitle(title);
         note.setContent(content);
         note.setSummary(summary);
         note.save(new SaveListener<String>() {
             @Override
             public void done(String objectId, BmobException e) {
-                if(e==null){
+                if (e == null) {
                     BmobQuery<Note> query = new BmobQuery<Note>();
                     query.getObject(objectId, new QueryListener<Note>() {
                         @Override
                         public void done(Note object, BmobException e) {
-                            if(e==null){
+                            if (e == null) {
                                 NoteEntity noteEntity = new NoteEntity();
                                 noteEntity.setId(new Date().getTime());
                                 noteEntity.setTitle(object.getTitle());
@@ -93,14 +91,14 @@ public class AddNoteActivity extends BaseActivity {
                                 noteEntity.setObjId(object.getObjectId());
                                 noteEntity.setDate(object.getUpdatedAt());
                                 CloudNoteApp.getNoteEntityDao().insert(noteEntity);
-                            }else{
-                                Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                            } else {
+                                Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
                             }
                         }
 
                     });
-                }else{
-                    Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                } else {
+                    Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
                 }
             }
         });

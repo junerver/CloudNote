@@ -1,5 +1,8 @@
 package com.junerver.cloudnote.db.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
@@ -16,7 +19,7 @@ import org.greenrobot.greendao.annotation.Generated;
  * 用于保存在本地的实体类
  */
 @Entity
-public class NoteEntity{
+public class NoteEntity implements Parcelable {
 
     /**
      * objectId : abd876be69
@@ -131,6 +134,43 @@ public class NoteEntity{
         return unixTime;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.summary);
+        dest.writeString(this.content);
+        dest.writeString(this.date);
+        dest.writeString(this.objId);
+        dest.writeLong(this.unixTime);
+    }
+
+    protected NoteEntity(Parcel in) {
+        this.id = in.readLong();
+        this.title = in.readString();
+        this.summary = in.readString();
+        this.content = in.readString();
+        this.date = in.readString();
+        this.objId = in.readString();
+        this.unixTime = in.readLong();
+    }
+
+    public static final Parcelable.Creator<NoteEntity> CREATOR = new Parcelable.Creator<NoteEntity>() {
+        @Override
+        public NoteEntity createFromParcel(Parcel source) {
+            return new NoteEntity(source);
+        }
+
+        @Override
+        public NoteEntity[] newArray(int size) {
+            return new NoteEntity[size];
+        }
+    };
 }
 
 
