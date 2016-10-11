@@ -8,4 +8,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="edit">编辑</string>
     <string name="delete">删除</string>
+    <string name="note_content_hint">请在此输入笔记内容</string>
+    <string name="image">图片</string>
+    <string name="video">视频</string>
+    <string name="note_title_hint">请在此输入笔记标题</string>
 </resources>

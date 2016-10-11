@@ -16,5 +16,80 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
+        <EditText
+            android:id="@+id/etNoteTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/note_title_size"
+            android:hint="@string/note_title_hint"
+            android:background="@null"
+            tools:text="测试标题大小"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/transparentgray"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/etNoteContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="all"
+                android:minWidth="300dp"
+                android:hint="@string/note_content_hint"
+                android:textSize="@dimen/note_content_size"
+                android:background="@null"/>
+        </ScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/show_note_bottom_height"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/btnPicture"
+                android:layout_width="@dimen/show_note_bottom_height"
+                android:layout_height="@dimen/show_note_bottom_height"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="@dimen/show_note_bottom_icon_height"
+                    android:layout_height="@dimen/show_note_bottom_icon_height"
+                    android:src="@drawable/insert_albun_image_icon"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/show_note_bottom_text_height"
+                    android:text="@string/image"
+                    android:textSize="12dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnVideo"
+                android:layout_width="@dimen/show_note_bottom_height"
+                android:layout_height="@dimen/show_note_bottom_height"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="@dimen/show_note_bottom_icon_height"
+                    android:layout_height="@dimen/show_note_bottom_icon_height"
+                    android:src="@drawable/new_note_camera"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/show_note_bottom_text_height"
+                    android:text="@string/video"
+                    android:textSize="12dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

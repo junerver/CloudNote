@@ -18,6 +18,15 @@
             android:layout_alignParentStart="true"
             android:id="@+id/ivBack"/>
 
-
+        <ImageView
+            android:layout_width="@dimen/tool_bar_item_icon_height"
+            android:layout_height="@dimen/tool_bar_item_icon_height"
+            android:layout_gravity="center_vertical"
+            android:paddingRight="@dimen/tool_bar_item_icon_padding"
+            android:src="@drawable/ic_done"
+            android:layout_alignTop="@+id/ivBack"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/ivDone"/>
     </RelativeLayout>
 </LinearLayout>

@@ -20,6 +20,7 @@ import com.junerver.cloudnote.adapter.NoteRecyclerAdapter;
 import com.junerver.cloudnote.db.entity.NoteEntity;
 import com.junerver.cloudnote.observable.NotesListFromDatabaseObservable;
 import com.junerver.cloudnote.ui.activity.AddNoteActivity;
+import com.junerver.cloudnote.ui.activity.EditNoteActivity;
 import com.junerver.cloudnote.ui.activity.ShowNoteActivity;
 import com.orhanobut.logger.Logger;
 
@@ -111,7 +112,7 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
     @OnClick(R.id.fabAddNote)
     public void onClick() {
         //进入添加页面
-        startActivity(new Intent(mContext, AddNoteActivity.class));
+        startActivity(new Intent(mContext, EditNoteActivity.class));
     }
 
 

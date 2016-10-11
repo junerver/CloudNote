@@ -39,7 +39,9 @@
             <TextView
                 android:id="@+id/tvNoteContent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/note_content_size"
+                tools:text="测试正文大小"/>
         </ScrollView>
 
         <LinearLayout

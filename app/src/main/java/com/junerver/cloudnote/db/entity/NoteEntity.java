@@ -159,7 +159,7 @@ public class NoteEntity implements Parcelable {
         this.objId = in.readString();
         this.unixTime = in.readLong();
     }
-
+    @Transient
     public static final Parcelable.Creator<NoteEntity> CREATOR = new Parcelable.Creator<NoteEntity>() {
         @Override
         public NoteEntity createFromParcel(Parcel source) {
