@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.junerver.cloudnote.ui.activity.ShowNoteActivity">
+    tools:context=".ui.activity.NoteDetailActivity">
 
     <include layout="@layout/back_bar"/>
 

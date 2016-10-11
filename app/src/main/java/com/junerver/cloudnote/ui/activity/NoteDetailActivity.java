@@ -25,7 +25,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * 用于查看笔记的页面
  */
 
-public class ShowNoteActivity extends BaseActivity {
+public class NoteDetailActivity extends BaseActivity {
 
 
     @BindView(R.id.tvNoteTitle)
@@ -65,12 +65,7 @@ public class ShowNoteActivity extends BaseActivity {
         return R.layout.activity_show_note;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.bind(this);
-    }
+
 
     @OnClick({R.id.btnEdit, R.id.btnDelete,R.id.ivBack})
     public void onClick(View view) {
@@ -81,7 +76,6 @@ public class ShowNoteActivity extends BaseActivity {
                 startActivity(editIntent);
                 break;
             case R.id.btnDelete:
-                // TODO: 2016/9/20 呼出对话框删除数据库同时删除bmob
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                 builder.setTitle("确认要删除这个笔记么？");
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
@@ -104,8 +98,6 @@ public class ShowNoteActivity extends BaseActivity {
                                 }
                             }
                         });
-
-
                     }
                 });
                 builder.setNegativeButton("取消", null);

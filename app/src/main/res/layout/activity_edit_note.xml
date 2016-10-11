@@ -37,15 +37,45 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <EditText
-                android:id="@+id/etNoteContent"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autoLink="all"
-                android:minWidth="300dp"
-                android:hint="@string/note_content_hint"
-                android:textSize="@dimen/note_content_size"
-                android:background="@null"/>
+                android:orientation="vertical">
+                <EditText
+                    android:id="@+id/etNoteContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="all"
+                    android:minWidth="300dp"
+                    android:hint="@string/note_content_hint"
+                    android:textSize="@dimen/note_content_size"
+                    android:background="@null"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="100dp">
+                    <ImageButton
+                        android:id="@+id/ibImage"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginRight="5dp"
+                        android:scaleType="centerCrop"
+                        android:background="@null"/>
+                    <ImageButton
+                        android:id="@+id/ibVideo"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="5dp"
+                        android:background="@null"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
         </ScrollView>
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,7 +83,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/btnPicture"
+                android:id="@+id/btnImage"
                 android:layout_width="@dimen/show_note_bottom_height"
                 android:layout_height="@dimen/show_note_bottom_height"
                 android:gravity="center_horizontal"

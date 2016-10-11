@@ -2,14 +2,11 @@ package com.junerver.cloudnote.ui.fragment;
 
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.github.jdsjlzx.interfaces.OnItemClickListener;
@@ -19,16 +16,14 @@ import com.junerver.cloudnote.R;
 import com.junerver.cloudnote.adapter.NoteRecyclerAdapter;
 import com.junerver.cloudnote.db.entity.NoteEntity;
 import com.junerver.cloudnote.observable.NotesListFromDatabaseObservable;
-import com.junerver.cloudnote.ui.activity.AddNoteActivity;
 import com.junerver.cloudnote.ui.activity.EditNoteActivity;
-import com.junerver.cloudnote.ui.activity.ShowNoteActivity;
+import com.junerver.cloudnote.ui.activity.NoteDetailActivity;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observer;
 
@@ -75,7 +70,7 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
             @Override
             public void onItemClick(View view, int i) {
                 NoteEntity noteEntity = mDataAdapter.getDataList().get(i);
-                Intent showIntent = new Intent(mContext, ShowNoteActivity.class);
+                Intent showIntent = new Intent(mContext, NoteDetailActivity.class);
                 showIntent.putExtra("Note", noteEntity);
                 startActivity(showIntent);
             }
@@ -100,7 +95,7 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
                 showShortToast("我的！");
                 break;
             case R.id.ivSync:
-                // TODO: 2016/9/6  同步，启用observable将数据库的数据与后端数据对比并同步
+                // TODO: 2016/9/6  同步，启用observable将数据库的数据与后端数据对比并同步，检测数据库的objId标志，如果没有则是没有同步的内容，则将这个内容同步
                 String msg = "同步中！";
 
                 showShortToast(msg);
