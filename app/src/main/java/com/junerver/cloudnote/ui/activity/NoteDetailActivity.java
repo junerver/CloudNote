@@ -8,6 +8,7 @@ import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
+import android.view.InflateException;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.junerver.cloudnote.CloudNoteApp;
 import com.junerver.cloudnote.R;
+import com.junerver.cloudnote.db.dao.NoteEntityDao;
 import com.junerver.cloudnote.db.entity.Note;
 import com.junerver.cloudnote.db.entity.NoteEntity;
 import com.orhanobut.logger.Logger;
@@ -45,22 +47,26 @@ public class NoteDetailActivity extends BaseActivity {
     ImageView mIvBack;
     @BindView(R.id.ivDone)
     ImageView mIvDone;
-    @BindView(R.id.ibImage)
-    ImageButton mIbImage;
+    @BindView(R.id.ivImage)
+    ImageView mIvImage;
     @BindView(R.id.ibVideo)
     ImageButton mIbVideo;
 
     private NoteEntity mNoteEntity;
+    private long id = 0L;
+    private static final int EDIT_NOTE = 3;
 
     @Override
     protected void initView() {
-
         mIvDone.setVisibility(View.GONE);
+        inflateView(mNoteEntity);
+    }
 
-        String title = mNoteEntity.getTitle();
-        String content = mNoteEntity.getContent();
-        String image = mNoteEntity.getImage();
-        String video = mNoteEntity.getVideo();
+    private void inflateView(NoteEntity noteEntity) {
+        String title = noteEntity.getTitle();
+        String content = noteEntity.getContent();
+        String image = noteEntity.getImage();
+        String video = noteEntity.getVideo();
 
         if (title != null) {
             mTvNoteTitle.setText(title);
@@ -69,7 +75,9 @@ public class NoteDetailActivity extends BaseActivity {
             mTvNoteContent.setText(content);
         }
         if (image != null) {
-            mIbImage.setImageBitmap(BitmapFactory.decodeFile(image));
+            Bitmap bitmap = BitmapFactory.decodeFile(image);
+            bitmap = ThumbnailUtils.extractThumbnail(bitmap, Math.max(500, mIvImage.getWidth()), Math.max(500, mIvImage.getHeight()), ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+            mIvImage.setImageBitmap(bitmap);
         }
         if (video != null) {
             Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND);
@@ -82,6 +90,7 @@ public class NoteDetailActivity extends BaseActivity {
     @Override
     protected void initData() {
         mNoteEntity = getIntent().getParcelableExtra("Note");
+        id = mNoteEntity.getId();
     }
 
     @Override
@@ -95,13 +104,13 @@ public class NoteDetailActivity extends BaseActivity {
     }
 
 
-    @OnClick({R.id.btnEdit, R.id.btnDelete, R.id.ivBack, R.id.ibImage, R.id.ibVideo})
+    @OnClick({R.id.btnEdit, R.id.btnDelete, R.id.ivBack, R.id.ivImage, R.id.ibVideo})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnEdit:
                 Intent editIntent = new Intent(mContext, EditNoteActivity.class);
                 editIntent.putExtra("Note", mNoteEntity);
-                startActivity(editIntent);
+                startActivityForResult(editIntent, EDIT_NOTE);
                 break;
             case R.id.btnDelete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -134,7 +143,7 @@ public class NoteDetailActivity extends BaseActivity {
             case R.id.ivBack:
                 finish();
                 break;
-            case R.id.ibImage:
+            case R.id.ivImage:
                 //查看图片
                 break;
             case R.id.ibVideo:
@@ -143,5 +152,13 @@ public class NoteDetailActivity extends BaseActivity {
         }
     }
 
-
+    //编辑后返回变更
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            mNoteEntity=data.getParcelableExtra("Note");
+            inflateView(mNoteEntity);
+        }
+    }
 }

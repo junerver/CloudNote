@@ -15,16 +15,15 @@ import rx.schedulers.Schedulers;
  * Created by junerver on 2016/9/10.
  */
 public class NotesFromDatabaseObservable {
+
     public static Observable<List<NoteEntity>> ofDate() {
         return Observable.create(new Observable.OnSubscribe<List<NoteEntity>>() {
             @Override
             public void call(Subscriber<? super List<NoteEntity>> subscriber) {
                 List<NoteEntity> noteEntities = NoteUtils.list();
                 if (noteEntities != null && noteEntities.size() != 0) {
-                    Logger.d("数据库中有数据！向配适器传送");
                     subscriber.onNext(noteEntities);
                 }
-
                 subscriber.onCompleted();
             }
         })

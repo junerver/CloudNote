@@ -21,6 +21,7 @@ import com.junerver.cloudnote.db.entity.NoteEntity;
 import com.junerver.cloudnote.observable.NotesSaveToDbAndBmobObservable;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -36,7 +37,7 @@ import rx.functions.Action1;
  * 更新数据操作设计bmob的数据更新操作只要获取到objectId就可以更新数据了
  */
 
-public class EditNoteActivity extends BaseActivity implements Observer<Boolean> {
+public class EditNoteActivity extends BaseActivity implements Observer<NoteEntity> {
 
 
     @BindView(R.id.ivBack)
@@ -86,7 +87,9 @@ public class EditNoteActivity extends BaseActivity implements Observer<Boolean> 
                 mEtNoteContent.setText(content);
             }
             if (image != null) {
-                mIbImage.setImageBitmap(BitmapFactory.decodeFile(image));
+                Bitmap bitmap = BitmapFactory.decodeFile(image);
+                bitmap = ThumbnailUtils.extractThumbnail(bitmap, Math.max(500, mIbImage.getWidth()), Math.max(500, mIbImage.getHeight()), ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+                mIbImage.setImageBitmap(bitmap);
             }
             if (video != null) {
                 Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND);
@@ -123,21 +126,21 @@ public class EditNoteActivity extends BaseActivity implements Observer<Boolean> 
                 String content = mEtNoteContent.getText().toString().trim();
                 String summary = getSummary(content);
                 if (mImageUri != null) {
-                    String image = mImageUri.toString();
+                    String image = mImageUri.getPath();
                     noteEntity.setImage(image);
                 }
                 if (mVideoUri != null) {
-                    String video = toString();
+                    String video = mVideoUri.getPath();
                     noteEntity.setVideo(video);
                 }
 
                 noteEntity.setTitle(title);
                 noteEntity.setContent(content);
                 noteEntity.setSummary(summary);
-
+                noteEntity.setDate(getStringDate());
                 NotesSaveToDbAndBmobObservable.save(noteEntity, isNew)
                         .subscribe(this);
-                finish();
+                showProgress();
                 break;
             case R.id.btnImage:
                 //添加照片
@@ -182,6 +185,18 @@ public class EditNoteActivity extends BaseActivity implements Observer<Boolean> 
         return String.valueOf(time);
     }
 
+    /**
+     * 获取现在时间
+     *
+     * @return返回字符串格式 yyyy-MM-dd HH:mm:ss
+     */
+    public static String getStringDate() {
+        Date currentTime = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = formatter.format(currentTime);
+        return dateString;
+    }
+
     //插入图片
     private void insertImage() {
         mImageFile = new File(Environment.getExternalStorageDirectory(), getTime() + ".png");
@@ -220,8 +235,10 @@ public class EditNoteActivity extends BaseActivity implements Observer<Boolean> 
         }
     }
 
+
     @Override
     public void onCompleted() {
+        closeProgress();
         showShortToast("笔记保存成功");
         finish();
     }
@@ -232,7 +249,9 @@ public class EditNoteActivity extends BaseActivity implements Observer<Boolean> 
     }
 
     @Override
-    public void onNext(Boolean aBoolean) {
-
+    public void onNext(NoteEntity noteEntity) {
+        Intent intent = new Intent();
+        intent.putExtra("Note", noteEntity);
+        setResult(RESULT_OK, intent);
     }
 }

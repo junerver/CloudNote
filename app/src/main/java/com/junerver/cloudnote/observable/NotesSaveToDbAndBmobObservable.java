@@ -22,50 +22,48 @@ import rx.schedulers.Schedulers;
  * Created by Junerver on 2016/10/12.
  * 这个类用于将从activity传来的笔记数据存储到数据库与bmob
  * 判断网络是否连接，有网络的情况同时保存，无网络的情况只保存数据库
+ * 处理完毕后像activity返回一个处理完毕的数据，用于向NoteDetailActivity提供更新视图的数据
  */
 public class NotesSaveToDbAndBmobObservable {
-    public static Observable<Boolean> save(final NoteEntity entity, final boolean isNew) {
+    public static Observable<NoteEntity> save(final NoteEntity entity, final boolean isNew) {
         //传入一个笔记的实例，在Observable中再次封装，并决定需不需要上传至Bmob
-        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+        return Observable.create(new Observable.OnSubscribe<NoteEntity>() {
             /**
              * @param subscriber
              */
             @Override
-            public void call(Subscriber<? super Boolean> subscriber) {
+            public void call(Subscriber<? super NoteEntity> subscriber) {
                 //判断是否存在网络连接
                 boolean isConnected = NetUtils.isConnected(CloudNoteApp.getContext());
-                Logger.d("当前网络状况为：" + isConnected);
-
-/////////////////////////////////////////////////////////////////////////////////////
                 if (isNew) {
-                    if (isConnected) {
-                        //新数据且有网络
-                        saveNewBmobByEntity(entity);
-                    } else {
-                        entity.setSync(false);
-                    }
                     //为新数据设置id
                     entity.setId(new Date().getTime());
-                    CloudNoteApp.getNoteEntityDao().insert(entity);
+                    if (isConnected) {
+                        //新数据且有网络
+                        saveNewBmobByEntity(entity, isNew,subscriber);
+                    } else {
+                        entity.setSync(false);
+                        CloudNoteApp.getNoteEntityDao().insert(entity);
+                        subscriber.onNext(entity);
+                        subscriber.onCompleted();
+                    }
                 } else {
                     if (isConnected) {
                         //旧数据且有网络，更新bmob对象
                         if (entity.getObjId() != null) {
                             //获取到这个旧数据的objectId
-                            updateNewBmobByEntity(entity, entity.getObjId());
+                            updateBmobByEntity(entity, entity.getObjId(), isNew,subscriber);
                         } else {
                             //这个旧数据并没有上传过
-                            saveNewBmobByEntity(entity);
+                            saveNewBmobByEntity(entity, isNew, subscriber);
                         }
                     } else {
                         entity.setSync(false);
+                        CloudNoteApp.getNoteEntityDao().update(entity);
+                        subscriber.onNext(entity);
+                        subscriber.onCompleted();
                     }
-                    //直接更新数据
-                    CloudNoteApp.getNoteEntityDao().update(entity);
                 }
-
-                subscriber.onNext(true);
-                subscriber.onCompleted();
             }
         })
                 .subscribeOn(Schedulers.io())                     //io线程执行
@@ -76,8 +74,9 @@ public class NotesSaveToDbAndBmobObservable {
      * 这个方法用于保存bmob云实例
      *
      * @param entity 数据实例
+     * @param subscriber
      */
-    private static void saveNewBmobByEntity(final NoteEntity entity) {
+    private static void saveNewBmobByEntity(final NoteEntity entity, final boolean isNew, final Subscriber<? super NoteEntity> subscriber) {
         Note note = createNewBmobByEntity(entity);
         note.save(new SaveListener<String>() {
             @Override
@@ -90,17 +89,25 @@ public class NotesSaveToDbAndBmobObservable {
                     entity.setSync(false);  //同步不成功
                     Logger.d("bmob保存失败：" + e.getMessage() + "," + e.getErrorCode());
                 }
+                //如果是新建的则需要插入，如果是编辑则需要更新
+                if (isNew) {
+                    CloudNoteApp.getNoteEntityDao().insert(entity);
+                } else {
+                    CloudNoteApp.getNoteEntityDao().update(entity);
+                }
+                subscriber.onNext(entity);
+                subscriber.onCompleted();
             }
         });
     }
 
     /**
      * 这个方法用于根据objectId来更新云实例
-     *
-     * @param entity   数据实例
+     *  @param entity   数据实例
      * @param objectId bmob用的objectId
+     * @param subscriber
      */
-    private static void updateNewBmobByEntity(final NoteEntity entity, String objectId) {
+    private static void updateBmobByEntity(final NoteEntity entity, String objectId, final boolean isNew, final Subscriber<? super NoteEntity> subscriber) {
         Note note = createNewBmobByEntity(entity);
         note.update(objectId, new UpdateListener() {
             @Override
@@ -112,6 +119,9 @@ public class NotesSaveToDbAndBmobObservable {
                     entity.setSync(false);  //同步不成功
                     Logger.d("bmob更新失败：" + e.getMessage() + "," + e.getErrorCode());
                 }
+                CloudNoteApp.getNoteEntityDao().update(entity);
+                subscriber.onNext(entity);
+                subscriber.onCompleted();
             }
         });
     }

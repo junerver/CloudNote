@@ -45,7 +45,6 @@ public class ListBaseAdapter extends RecyclerView.Adapter {
     public void setDataList(Collection<NoteEntity> list) {
         this.mDataList.clear();
         this.mDataList.addAll(list);
-        Logger.d("列表数据更新！");
         notifyDataSetChanged();
     }
 

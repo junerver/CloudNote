@@ -1,10 +1,12 @@
 package com.junerver.cloudnote.ui.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.junerver.cloudnote.R;
@@ -17,7 +19,7 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 
-public class LoginActivity extends BaseActivity{
+public class LoginActivity extends BaseActivity {
 
     @BindView(R.id.etLoginUsername)
     EditText mEtLoginUsername;
@@ -29,6 +31,8 @@ public class LoginActivity extends BaseActivity{
     TextView mTvRegister;
     @BindView(R.id.tvQuicklogin)
     TextView mTvQuicklogin;
+    @BindView(R.id.ivBack)
+    ImageView mIvBack;
 
     private String mLoginUsername;
     private String mLoginPassword;
@@ -54,17 +58,17 @@ public class LoginActivity extends BaseActivity{
         return R.layout.activity_login;
     }
 
-    @OnClick({R.id.btnLogin, R.id.tvRegister})
+    @OnClick({R.id.btnLogin, R.id.tvRegister, R.id.ivBack})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnLogin:
-                mLoginUsername =mEtLoginUsername.getText().toString().trim();
-                mLoginPassword =mEtLoginPassword.getText().toString().trim();
+                mLoginUsername = mEtLoginUsername.getText().toString().trim();
+                mLoginPassword = mEtLoginPassword.getText().toString().trim();
 
                 //都不是空
                 if (!NetUtils.isConnected(mContext)) {
                     showShortToast("没有网络连接！！！");
-                }else if (TextUtils.isEmpty(mLoginUsername)) {
+                } else if (TextUtils.isEmpty(mLoginUsername)) {
                     mEtLoginUsername.requestFocus();
                     mEtLoginUsername.setError("对不起，用户名不能为空");
                     return;
@@ -77,15 +81,15 @@ public class LoginActivity extends BaseActivity{
                     BmobUser bmobUser = new BmobUser();
                     bmobUser.setUsername(mLoginUsername);
                     bmobUser.setPassword(mLoginPassword);
-                    bmobUser.login( new SaveListener<BmobUser>() {
+                    bmobUser.login(new SaveListener<BmobUser>() {
                         @Override
                         public void done(BmobUser bmobUser, BmobException e) {
                             closeProgress();
-                            if(e==null){
+                            if (e == null) {
                                 //进入主页面
-                                startActivity(new Intent(mContext,MainActivity.class));
+                                startActivity(new Intent(mContext, MainActivity.class));
                                 LoginActivity.this.finish();
-                            }else{
+                            } else {
                                 showShortToast("用户名或者密码错误！！！");
                             }
                         }
@@ -95,7 +99,11 @@ public class LoginActivity extends BaseActivity{
             case R.id.tvRegister:
                 startActivity(new Intent(mContext, RegisterActivity.class));
                 break;
+            case R.id.ivBack:
+                finish();
+                break;
         }
     }
+
 
 }

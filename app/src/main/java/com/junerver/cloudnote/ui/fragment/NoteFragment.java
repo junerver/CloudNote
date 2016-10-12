@@ -123,9 +123,9 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
     @Override
     public void onCompleted() {
         //更新配适器数据
-        Logger.d("配适器更新数据！");
         mDataAdapter.setDataList(mNoteEntities);
-
+        mDataAdapter.notifyDataSetChanged();
+        mLRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -136,7 +136,6 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
     @Override
     public void onNext(List<NoteEntity> noteEntities) {
         //从数据库获取本地数据
-        Logger.d("fragment页面接收到数据");
         this.mNoteEntities=noteEntities;
     }
 }
