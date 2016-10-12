@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.junerver.cloudnote.db.entity.NoteEntity;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,6 +45,7 @@ public class ListBaseAdapter extends RecyclerView.Adapter {
     public void setDataList(Collection<NoteEntity> list) {
         this.mDataList.clear();
         this.mDataList.addAll(list);
+        Logger.d("列表数据更新！");
         notifyDataSetChanged();
     }
 

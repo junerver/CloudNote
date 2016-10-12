@@ -13,7 +13,7 @@ buildscript {
 }
 
 greendao {
-    schemaVersion 1
+    schemaVersion 2
     daoPackage 'com.junerver.cloudnote.db.dao'
     targetGenDir 'src/main/java'
 }

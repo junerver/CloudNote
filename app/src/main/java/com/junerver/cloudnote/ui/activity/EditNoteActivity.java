@@ -70,12 +70,10 @@ public class EditNoteActivity extends BaseActivity implements Observer<Boolean> 
 
     @Override
     protected void initData() {
-        Intent intent = getIntent();
-        if (intent != null) {
+        mNoteEntity = getIntent().getParcelableExtra("Note");
+        if (mNoteEntity != null) {
             //不为空说明是编辑
             isNew = false;
-            mNoteEntity = getIntent().getParcelableExtra("Note");
-
             String title = mNoteEntity.getTitle();
             String content = mNoteEntity.getContent();
             String image = mNoteEntity.getImage();
@@ -119,23 +117,27 @@ public class EditNoteActivity extends BaseActivity implements Observer<Boolean> 
                 finish();
                 break;
             case R.id.ivDone:
+                //如果是新建笔记就新建实例，否则使用原来的实例
+                NoteEntity noteEntity = isNew ? new NoteEntity() : mNoteEntity;
                 String title = mEtNoteTitle.getText().toString().trim();
                 String content = mEtNoteContent.getText().toString().trim();
                 String summary = getSummary(content);
-                String image = mImageUri.toString();
-                String video = mVideoUri.toString();
-                //如果是新建笔记就新建实例，否则使用原来的实例
-                NoteEntity noteEntity = isNew ? new NoteEntity() : mNoteEntity;
+                if (mImageUri != null) {
+                    String image = mImageUri.toString();
+                    noteEntity.setImage(image);
+                }
+                if (mVideoUri != null) {
+                    String video = toString();
+                    noteEntity.setVideo(video);
+                }
+
                 noteEntity.setTitle(title);
                 noteEntity.setContent(content);
                 noteEntity.setSummary(summary);
-                noteEntity.setImage(image);
-                noteEntity.setVideo(video);
-
 
                 NotesSaveToDbAndBmobObservable.save(noteEntity, isNew)
                         .subscribe(this);
-
+                finish();
                 break;
             case R.id.btnImage:
                 //添加照片

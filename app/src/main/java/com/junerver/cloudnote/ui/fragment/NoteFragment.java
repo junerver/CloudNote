@@ -116,6 +116,8 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
         super.onResume();
         NotesFromDatabaseObservable.ofDate()
                 .subscribe(this);
+        mDataAdapter.notifyDataSetChanged();
+        mLRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -123,6 +125,7 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
         //更新配适器数据
         Logger.d("配适器更新数据！");
         mDataAdapter.setDataList(mNoteEntities);
+
     }
 
     @Override
