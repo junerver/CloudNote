@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.github.jdsjlzx.interfaces.OnItemClickListener;
@@ -16,6 +17,7 @@ import com.junerver.cloudnote.R;
 import com.junerver.cloudnote.adapter.NoteRecyclerAdapter;
 import com.junerver.cloudnote.db.entity.NoteEntity;
 import com.junerver.cloudnote.observable.NotesFromDatabaseObservable;
+import com.junerver.cloudnote.observable.NotesSyncToBmobObservable;
 import com.junerver.cloudnote.ui.activity.EditNoteActivity;
 import com.junerver.cloudnote.ui.activity.NoteDetailActivity;
 import com.orhanobut.logger.Logger;
@@ -97,8 +99,9 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
             case R.id.ivSync:
                 // TODO: 2016/9/6  同步，启用observable将数据库的数据与后端数据对比并同步，检测数据库的objId标志，如果没有则是没有同步的内容，则将这个内容同步
                 String msg = "同步中！";
-
-                showShortToast(msg);
+                mIvSync.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.anim_sync));   //动画效果
+                NotesSyncToBmobObservable.sync()
+                        .subscribe();
                 break;
         }
     }

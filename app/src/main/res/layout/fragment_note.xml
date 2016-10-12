@@ -41,7 +41,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/ivMine"
-            android:paddingRight="@dimen/tool_bar_item_icon_padding"
+            android:layout_marginRight="@dimen/tool_bar_item_icon_padding"
             android:src="@drawable/ic_sync_white_48dp"/>
     </RelativeLayout>
 
