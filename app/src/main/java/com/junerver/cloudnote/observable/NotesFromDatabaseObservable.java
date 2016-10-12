@@ -14,7 +14,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by junerver on 2016/9/10.
  */
-public class NotesListFromDatabaseObservable {
+public class NotesFromDatabaseObservable {
     public static Observable<List<NoteEntity>> ofDate() {
         return Observable.create(new Observable.OnSubscribe<List<NoteEntity>>() {
             @Override

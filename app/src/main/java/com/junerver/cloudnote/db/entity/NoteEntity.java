@@ -11,12 +11,14 @@ import org.greenrobot.greendao.annotation.Transient;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.PriorityQueue;
 
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by junerver on 2016/9/1.
  * 用于保存在本地的实体类
+ * update 16-10-12:增加字段 image video
  */
 @Entity
 public class NoteEntity implements Parcelable {
@@ -28,7 +30,7 @@ public class NoteEntity implements Parcelable {
      */
 
     @Id(autoincrement = true)
-    private long id;        //本地数据库id 自增长
+    private long id;        //本地数据库id 计划采用unix时间戳代替
 
     @Property(nameInDb = "TITLE")
     private String title;       //标题
@@ -39,14 +41,66 @@ public class NoteEntity implements Parcelable {
     @Property(nameInDb = "CONTENT")
     private String content;     //文章正文
 
+    @Property(nameInDb = "IMAGE")
+    private String image;   //图片
+
+
+
+    @Property(nameInDb = "VIDEO")
+    private String video;   //视频
+
     @Property(nameInDb = "DATE")
     private String date;   //更新日期
 
     @Property(nameInDb = "OBJ_ID")
     private String objId;   //保存bmob云实体id（用于查询bmob对象）
 
-    @Transient
-    private long unixTime =0L;
+    @Property(nameInDb = "IS_SYNC")
+    private boolean isSync;     //是否已经同步
+
+
+    @Generated(hash = 290996040)
+    public NoteEntity(long id, String title, String summary, String content,
+            String image, String video, String date, String objId, boolean isSync) {
+        this.id = id;
+        this.title = title;
+        this.summary = summary;
+        this.content = content;
+        this.image = image;
+        this.video = video;
+        this.date = date;
+        this.objId = objId;
+        this.isSync = isSync;
+    }
+
+    @Generated(hash = 734234824)
+    public NoteEntity() {
+    }
+
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
+    }
+
+    public boolean isSync() {
+        return isSync;
+    }
+
+    public void setSync(boolean sync) {
+        isSync = sync;
+    }
 
     public String getObjId() {
         return this.objId;
@@ -96,43 +150,14 @@ public class NoteEntity implements Parcelable {
         this.id = id;
     }
 
-    @Generated(hash = 546637644)
-    public NoteEntity(long id, String title, String summary, String content,
-            String date, String objId) {
-        this.id = id;
-        this.title = title;
-        this.summary = summary;
-        this.content = content;
-        this.date = date;
-        this.objId = objId;
+    public boolean getIsSync() {
+        return this.isSync;
     }
 
-    public NoteEntity(String title, String summary, String content, String date, String objId) {
-        this.id = new Date().getTime();
-        this.title = title;
-        this.summary = summary;
-        this.content = content;
-        this.date = date;
-        this.objId = objId;
+    public void setIsSync(boolean isSync) {
+        this.isSync = isSync;
     }
 
-    @Generated(hash = 734234824)
-    public NoteEntity() {
-    }
-
-    public long getUnixTime() {
-        if (this.unixTime == 0L) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try {
-                Date date = simpleDateFormat.parse(getDate());
-                long time = date.getTime();
-                this.unixTime = time/1000;
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        return unixTime;
-    }
 
     @Override
     public int describeContents() {
@@ -145,9 +170,11 @@ public class NoteEntity implements Parcelable {
         dest.writeString(this.title);
         dest.writeString(this.summary);
         dest.writeString(this.content);
+        dest.writeString(this.image);
+        dest.writeString(this.video);
         dest.writeString(this.date);
         dest.writeString(this.objId);
-        dest.writeLong(this.unixTime);
+        dest.writeByte(this.isSync ? (byte) 1 : (byte) 0);
     }
 
     protected NoteEntity(Parcel in) {
@@ -155,10 +182,13 @@ public class NoteEntity implements Parcelable {
         this.title = in.readString();
         this.summary = in.readString();
         this.content = in.readString();
+        this.image = in.readString();
+        this.video = in.readString();
         this.date = in.readString();
         this.objId = in.readString();
-        this.unixTime = in.readLong();
+        this.isSync = in.readByte() != 0;
     }
+
     @Transient
     public static final Parcelable.Creator<NoteEntity> CREATOR = new Parcelable.Creator<NoteEntity>() {
         @Override

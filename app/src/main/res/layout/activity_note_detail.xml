@@ -35,13 +35,40 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/tvNoteContent"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/note_content_size"
-                tools:text="测试正文大小"/>
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvNoteContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/note_content_size"
+                    tools:text="测试正文大小"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="100dp">
+                    <ImageButton
+                        android:id="@+id/ibImage"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginRight="5dp"
+                        android:scaleType="centerCrop"
+                        android:background="@null"/>
+                    <ImageButton
+                        android:id="@+id/ibVideo"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="5dp"
+                        android:background="@null"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
         </ScrollView>
 
         <LinearLayout

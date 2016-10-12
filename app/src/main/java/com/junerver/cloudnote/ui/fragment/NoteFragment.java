@@ -15,7 +15,7 @@ import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
 import com.junerver.cloudnote.R;
 import com.junerver.cloudnote.adapter.NoteRecyclerAdapter;
 import com.junerver.cloudnote.db.entity.NoteEntity;
-import com.junerver.cloudnote.observable.NotesListFromDatabaseObservable;
+import com.junerver.cloudnote.observable.NotesFromDatabaseObservable;
 import com.junerver.cloudnote.ui.activity.EditNoteActivity;
 import com.junerver.cloudnote.ui.activity.NoteDetailActivity;
 import com.orhanobut.logger.Logger;
@@ -114,7 +114,7 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
     @Override
     public void onResume() {
         super.onResume();
-        NotesListFromDatabaseObservable.ofDate()
+        NotesFromDatabaseObservable.ofDate()
                 .subscribe(this);
     }
 

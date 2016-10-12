@@ -2,9 +2,14 @@ package com.junerver.cloudnote.ui.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,14 +45,38 @@ public class NoteDetailActivity extends BaseActivity {
     ImageView mIvBack;
     @BindView(R.id.ivDone)
     ImageView mIvDone;
+    @BindView(R.id.ibImage)
+    ImageButton mIbImage;
+    @BindView(R.id.ibVideo)
+    ImageButton mIbVideo;
 
     private NoteEntity mNoteEntity;
 
     @Override
     protected void initView() {
-        mTvNoteTitle.setText(mNoteEntity.getTitle());
-        mTvNoteContent.setText(mNoteEntity.getContent());
+
         mIvDone.setVisibility(View.GONE);
+
+        String title = mNoteEntity.getTitle();
+        String content = mNoteEntity.getContent();
+        String image = mNoteEntity.getImage();
+        String video = mNoteEntity.getVideo();
+
+        if (title != null) {
+            mTvNoteTitle.setText(title);
+        }
+        if (content != null) {
+            mTvNoteContent.setText(content);
+        }
+        if (image != null) {
+            mIbImage.setImageBitmap(BitmapFactory.decodeFile(image));
+        }
+        if (video != null) {
+            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND);
+            bitmap = ThumbnailUtils.extractThumbnail(bitmap, Math.max(500, mIbVideo.getWidth()), Math.max(500, mIbVideo.getHeight()), ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+            mIbVideo.setImageBitmap(bitmap);
+        }
+
     }
 
     @Override
@@ -62,12 +91,11 @@ public class NoteDetailActivity extends BaseActivity {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.activity_show_note;
+        return R.layout.activity_note_detail;
     }
 
 
-
-    @OnClick({R.id.btnEdit, R.id.btnDelete,R.id.ivBack})
+    @OnClick({R.id.btnEdit, R.id.btnDelete, R.id.ivBack, R.id.ibImage, R.id.ibVideo})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnEdit:
@@ -106,7 +134,14 @@ public class NoteDetailActivity extends BaseActivity {
             case R.id.ivBack:
                 finish();
                 break;
+            case R.id.ibImage:
+                //查看图片
+                break;
+            case R.id.ibVideo:
+                //查看视频
+                break;
         }
     }
+
 
 }

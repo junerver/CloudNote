@@ -28,8 +28,11 @@ public class NoteEntityDao extends AbstractDao<NoteEntity, Long> {
         public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
         public final static Property Summary = new Property(2, String.class, "summary", false, "SUMMARY");
         public final static Property Content = new Property(3, String.class, "content", false, "CONTENT");
-        public final static Property Date = new Property(4, String.class, "date", false, "DATE");
-        public final static Property ObjId = new Property(5, String.class, "objId", false, "OBJ_ID");
+        public final static Property Image = new Property(4, String.class, "image", false, "IMAGE");
+        public final static Property Video = new Property(5, String.class, "video", false, "VIDEO");
+        public final static Property Date = new Property(6, String.class, "date", false, "DATE");
+        public final static Property ObjId = new Property(7, String.class, "objId", false, "OBJ_ID");
+        public final static Property IsSync = new Property(8, boolean.class, "isSync", false, "IS_SYNC");
     };
 
 
@@ -49,8 +52,11 @@ public class NoteEntityDao extends AbstractDao<NoteEntity, Long> {
                 "\"TITLE\" TEXT," + // 1: title
                 "\"SUMMARY\" TEXT," + // 2: summary
                 "\"CONTENT\" TEXT," + // 3: content
-                "\"DATE\" TEXT," + // 4: date
-                "\"OBJ_ID\" TEXT);"); // 5: objId
+                "\"IMAGE\" TEXT," + // 4: image
+                "\"VIDEO\" TEXT," + // 5: video
+                "\"DATE\" TEXT," + // 6: date
+                "\"OBJ_ID\" TEXT," + // 7: objId
+                "\"IS_SYNC\" INTEGER NOT NULL );"); // 8: isSync
     }
 
     /** Drops the underlying database table. */
@@ -79,15 +85,26 @@ public class NoteEntityDao extends AbstractDao<NoteEntity, Long> {
             stmt.bindString(4, content);
         }
  
+        String image = entity.getImage();
+        if (image != null) {
+            stmt.bindString(5, image);
+        }
+ 
+        String video = entity.getVideo();
+        if (video != null) {
+            stmt.bindString(6, video);
+        }
+ 
         String date = entity.getDate();
         if (date != null) {
-            stmt.bindString(5, date);
+            stmt.bindString(7, date);
         }
  
         String objId = entity.getObjId();
         if (objId != null) {
-            stmt.bindString(6, objId);
+            stmt.bindString(8, objId);
         }
+        stmt.bindLong(9, entity.getIsSync() ? 1L: 0L);
     }
 
     @Override
@@ -110,15 +127,26 @@ public class NoteEntityDao extends AbstractDao<NoteEntity, Long> {
             stmt.bindString(4, content);
         }
  
+        String image = entity.getImage();
+        if (image != null) {
+            stmt.bindString(5, image);
+        }
+ 
+        String video = entity.getVideo();
+        if (video != null) {
+            stmt.bindString(6, video);
+        }
+ 
         String date = entity.getDate();
         if (date != null) {
-            stmt.bindString(5, date);
+            stmt.bindString(7, date);
         }
  
         String objId = entity.getObjId();
         if (objId != null) {
-            stmt.bindString(6, objId);
+            stmt.bindString(8, objId);
         }
+        stmt.bindLong(9, entity.getIsSync() ? 1L: 0L);
     }
 
     @Override
@@ -133,8 +161,11 @@ public class NoteEntityDao extends AbstractDao<NoteEntity, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // title
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // summary
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // content
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // date
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // objId
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // image
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // video
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // date
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // objId
+            cursor.getShort(offset + 8) != 0 // isSync
         );
         return entity;
     }
@@ -145,8 +176,11 @@ public class NoteEntityDao extends AbstractDao<NoteEntity, Long> {
         entity.setTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setSummary(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setContent(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setDate(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setObjId(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setImage(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setVideo(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setDate(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setObjId(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setIsSync(cursor.getShort(offset + 8) != 0);
      }
     
     @Override

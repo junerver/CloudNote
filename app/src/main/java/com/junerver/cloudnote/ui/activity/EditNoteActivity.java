@@ -8,36 +8,35 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.junerver.cloudnote.CloudNoteApp;
 import com.junerver.cloudnote.R;
 import com.junerver.cloudnote.db.entity.Note;
 import com.junerver.cloudnote.db.entity.NoteEntity;
+import com.junerver.cloudnote.observable.NotesSaveToDbAndBmobObservable;
 
 import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.QueryListener;
-import cn.bmob.v3.listener.SaveListener;
+import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * 用于编辑笔记的页面
  * 更新数据操作设计bmob的数据更新操作只要获取到objectId就可以更新数据了
  */
 
-public class EditNoteActivity extends BaseActivity {
+public class EditNoteActivity extends BaseActivity implements Observer<Boolean> {
 
 
     @BindView(R.id.ivBack)
@@ -67,7 +66,6 @@ public class EditNoteActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-
     }
 
     @Override
@@ -77,10 +75,26 @@ public class EditNoteActivity extends BaseActivity {
             //不为空说明是编辑
             isNew = false;
             mNoteEntity = getIntent().getParcelableExtra("Note");
-            //获取id
-            id = mNoteEntity.getId();
-            mEtNoteTitle.setText(mNoteEntity.getTitle());
-            mEtNoteContent.setText(mNoteEntity.getContent());
+
+            String title = mNoteEntity.getTitle();
+            String content = mNoteEntity.getContent();
+            String image = mNoteEntity.getImage();
+            String video = mNoteEntity.getVideo();
+
+            if (title != null) {
+                mEtNoteTitle.setText(title);
+            }
+            if (content != null) {
+                mEtNoteContent.setText(content);
+            }
+            if (image != null) {
+                mIbImage.setImageBitmap(BitmapFactory.decodeFile(image));
+            }
+            if (video != null) {
+                Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND);
+                bitmap = ThumbnailUtils.extractThumbnail(bitmap, Math.max(500, mIbVideo.getWidth()), Math.max(500, mIbVideo.getHeight()), ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+                mIbVideo.setImageBitmap(bitmap);
+            }
         } else {
             //为新笔记
             isNew = true;
@@ -89,7 +103,6 @@ public class EditNoteActivity extends BaseActivity {
 
     @Override
     protected void setListeners() {
-
     }
 
     @Override
@@ -106,53 +119,23 @@ public class EditNoteActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.ivDone:
-                if (isNew) {
-                    //是新建笔记
-                    String title = mEtNoteTitle.getText().toString().trim();
-                    String content = mEtNoteContent.getText().toString().trim();
-                    String summary;
-                    if (content.length() >= 10) {
-                        summary = content.substring(0, 9);
-                    } else {
-                        summary = content;
-                    }
-                    //创建bmob对象
-                    // TODO: 2016/10/11 下面这部分逻辑应该整合成Observable 大致逻辑应该是判断是否有网络，有网络时保存bmob对象，然后保存数据库，没有网络时只保存本地数据库
-                    Note note = new Note();
-                    note.setTitle(title);
-                    note.setContent(content);
-                    note.setSummary(summary);
-                    note.save(new SaveListener<String>() {
-                        @Override
-                        public void done(String objectId, BmobException e) {
-                            if (e == null) {
-                                BmobQuery<Note> query = new BmobQuery<Note>();
-                                query.getObject(objectId, new QueryListener<Note>() {
-                                    @Override
-                                    public void done(Note object, BmobException e) {
-                                        if (e == null) {
-                                            NoteEntity noteEntity = new NoteEntity();
-                                            noteEntity.setId(new Date().getTime());
-                                            noteEntity.setTitle(object.getTitle());
-                                            noteEntity.setContent(object.getContent());
-                                            noteEntity.setSummary(object.getSummary());
-                                            noteEntity.setObjId(object.getObjectId());
-                                            noteEntity.setDate(object.getUpdatedAt());
-                                            CloudNoteApp.getNoteEntityDao().insert(noteEntity);
-                                        } else {
-                                            Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
-                                        }
-                                    }
-                                });
-                            } else {
-                                Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
-                            }
-                        }
-                    });
-                } else {
-                    //编辑原有笔记
-                    //todo:本地数据库数据更新与Bmob数据更新
-                }
+                String title = mEtNoteTitle.getText().toString().trim();
+                String content = mEtNoteContent.getText().toString().trim();
+                String summary = getSummary(content);
+                String image = mImageUri.toString();
+                String video = mVideoUri.toString();
+                //如果是新建笔记就新建实例，否则使用原来的实例
+                NoteEntity noteEntity = isNew ? new NoteEntity() : mNoteEntity;
+                noteEntity.setTitle(title);
+                noteEntity.setContent(content);
+                noteEntity.setSummary(summary);
+                noteEntity.setImage(image);
+                noteEntity.setVideo(video);
+
+
+                NotesSaveToDbAndBmobObservable.save(noteEntity, isNew)
+                        .subscribe(this);
+
                 break;
             case R.id.btnImage:
                 //添加照片
@@ -163,20 +146,31 @@ public class EditNoteActivity extends BaseActivity {
                 insertVideo();
                 break;
             case R.id.ibImage:
-                if (mImageUri != null){
+                if (mImageUri != null) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(mImageUri, "image/*");
                     startActivity(intent);
                 }
                 break;
             case R.id.ibVideo:
-                if (mVideoUri != null){
+                if (mVideoUri != null) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(mVideoUri,"video/mpeg4");
+                    intent.setDataAndType(mVideoUri, "video/mpeg4");
                     startActivity(intent);
                 }
                 break;
         }
+    }
+
+    @NonNull
+    private String getSummary(String content) {
+        String summary;
+        if (content.length() >= 10) {
+            summary = content.substring(0, 9);
+        } else {
+            summary = content;
+        }
+        return summary;
     }
 
     //获取字符串格式的时间
@@ -225,10 +219,18 @@ public class EditNoteActivity extends BaseActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.bind(this);
+    public void onCompleted() {
+        showShortToast("笔记保存成功");
+        finish();
     }
 
+    @Override
+    public void onError(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onNext(Boolean aBoolean) {
+
+    }
 }
