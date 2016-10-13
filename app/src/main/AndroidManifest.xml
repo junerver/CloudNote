@@ -47,8 +47,6 @@
         </activity>
         <activity android:name=".ui.activity.RegisterActivity">
         </activity>
-        <activity android:name=".ui.activity.AddNoteActivity">
-        </activity>
         <activity android:name=".ui.activity.NoteDetailActivity">
         </activity>
         <activity android:name=".ui.activity.EditNoteActivity">

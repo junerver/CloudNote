@@ -78,7 +78,7 @@ public class NotesSaveToDbAndBmobObservable {
      * @param subscriber
      */
     private static void saveNewBmobByEntity(final NoteEntity entity, final boolean isNew, final Subscriber<? super NoteEntity> subscriber) {
-        Note note = createNewBmobByEntity(entity);
+        Note note = entity.toBmob();
         note.save(new SaveListener<String>() {
             @Override
             public void done(String objectId, BmobException e) {
@@ -109,7 +109,7 @@ public class NotesSaveToDbAndBmobObservable {
      * @param subscriber
      */
     private static void updateBmobByEntity(final NoteEntity entity, String objectId, final boolean isNew, final Subscriber<? super NoteEntity> subscriber) {
-        Note note = createNewBmobByEntity(entity);
+        Note note = entity.toBmob();
         note.update(objectId, new UpdateListener() {
             @Override
             public void done(BmobException e) {
@@ -127,11 +127,4 @@ public class NotesSaveToDbAndBmobObservable {
         });
     }
 
-
-    private static Note createNewBmobByEntity(NoteEntity entity) {
-        //封装bmob实例
-        Note note = entity.toBmob();
-        note.setUserObjId(BmobUser.getCurrentUser().getUsername());
-        return note;
-    }
 }

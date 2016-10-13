@@ -1,6 +1,7 @@
 package com.junerver.cloudnote.ui.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.junerver.cloudnote.R;
+import com.junerver.cloudnote.ui.activity.LoginActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,7 +22,6 @@ import cn.bmob.v3.BmobUser;
  * A simple {@link Fragment} subclass.
  */
 public class ConfigFragment extends BaseFragment {
-
 
     @BindView(R.id.ivUserAvatar)
     ImageView mIvUserAvatar;
@@ -43,5 +44,8 @@ public class ConfigFragment extends BaseFragment {
 
     @OnClick(R.id.btnInOut)
     public void onClick() {
+        BmobUser.logOut();   //清除缓存用户对象
+        startActivity(new Intent(mContext, LoginActivity.class));
+        getActivity().finish();
     }
 }

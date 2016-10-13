@@ -23,7 +23,6 @@ import java.util.List;
  */
 public class TabView extends LinearLayout implements View.OnClickListener {
 
-
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
     private PagerAdapter mPagerAdapter;

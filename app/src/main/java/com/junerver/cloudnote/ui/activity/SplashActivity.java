@@ -15,8 +15,6 @@ import cn.bmob.v3.listener.SaveListener;
 
 public class SplashActivity extends AppCompatActivity {
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +34,6 @@ public class SplashActivity extends AppCompatActivity {
             }
         }, 1000);
     }
-
 
     public void isFirstRun() {
 

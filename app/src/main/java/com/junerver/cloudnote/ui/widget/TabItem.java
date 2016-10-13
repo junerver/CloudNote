@@ -16,7 +16,6 @@ import android.view.View;
 public class TabItem extends View {
 
     /*字体大小*/
-
     private int mTextSize ;
 
     /*字体选中的颜色*/

@@ -39,19 +39,13 @@ public class LoginActivity extends BaseActivity {
 
 
     @Override
-    protected void initView() {
-
-    }
+    protected void initView() {}
 
     @Override
-    protected void initData() {
-
-    }
+    protected void initData() {}
 
     @Override
-    protected void setListeners() {
-
-    }
+    protected void setListeners() {}
 
     @Override
     protected int getLayoutId() {

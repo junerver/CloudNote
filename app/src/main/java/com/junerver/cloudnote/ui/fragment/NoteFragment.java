@@ -61,7 +61,6 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
     private LinearLayoutManager mLayoutManager;
     private List<NoteEntity> mNoteEntities = new ArrayList<>();
 
-
     @Override
     protected void init() {
 
@@ -127,7 +126,6 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
         }
     }
 
-
     @OnClick(R.id.fabAddNote)
     public void onClick() {
         //进入添加页面
@@ -149,9 +147,7 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
     }
 
     @Override
-    public void onError(Throwable throwable) {
-
-    }
+    public void onError(Throwable throwable) {}
 
     @Override
     public void onNext(List<NoteEntity> noteEntities) {

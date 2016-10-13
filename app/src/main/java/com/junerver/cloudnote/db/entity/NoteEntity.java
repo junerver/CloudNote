@@ -15,6 +15,8 @@ import java.util.PriorityQueue;
 
 import org.greenrobot.greendao.annotation.Generated;
 
+import cn.bmob.v3.BmobUser;
+
 /**
  * Created by junerver on 2016/9/1.
  * 用于保存在本地的实体类
@@ -210,6 +212,7 @@ public class NoteEntity implements Parcelable {
         bmobNote.setImage(getImage());
         bmobNote.setVideo(getVideo());
         bmobNote.setDbId(getId());
+        bmobNote.setUserObjId(BmobUser.getCurrentUser().getUsername());
         return bmobNote;
     }
 }

@@ -40,12 +40,9 @@ public class MainActivity extends BaseActivity {
     private ViewPager mViewPager ;
     private TabView mTabView ;
     private Map<Integer,Fragment> mFragmentMap ;
-    public static String userObjId = BmobUser.getCurrentUser().getObjectId();
-
 
     @Override
     protected void initView() {
-
         mFragmentMap = new HashMap<>() ;
         mViewPager = (ViewPager)findViewById(R.id.id_view_pager) ;
         mViewPager.setOffscreenPageLimit(2);
@@ -53,19 +50,13 @@ public class MainActivity extends BaseActivity {
         mTabView = (TabView)findViewById(R.id.id_tab) ;
         mTabView.setViewPager(mViewPager);
         Logger.d("您的用户名是："+BmobUser.getCurrentUser().getUsername());
-
-
     }
 
     @Override
-    protected void initData() {
-
-    }
+    protected void initData() {}
 
     @Override
-    protected void setListeners() {
-
-    }
+    protected void setListeners() {}
 
     private Fragment getFragment(int position){
         Fragment fragment = mFragmentMap.get(position) ;

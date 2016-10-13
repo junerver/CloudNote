@@ -42,7 +42,6 @@ public class NotesSyncToBmobObservable {
                         boolean isConnected = NetUtils.isConnected(CloudNoteApp.getContext());
                         //封装对象
                         Note note = noteEntity.toBmob();
-                        note.setUserObjId(BmobUser.getCurrentUser().getUsername());
                         if (TextUtils.isEmpty(noteEntity.getObjId())) {
                             //为空说明这个云端对象不存早或者没有创建
                             if (isConnected) {

@@ -34,7 +34,6 @@ import cn.bmob.v3.listener.UpdateListener;
 
 public class NoteDetailActivity extends BaseActivity {
 
-
     @BindView(R.id.tvNoteTitle)
     TextView mTvNoteTitle;
     @BindView(R.id.tvNoteContent)
@@ -53,7 +52,6 @@ public class NoteDetailActivity extends BaseActivity {
     ImageButton mIbVideo;
 
     private NoteEntity mNoteEntity;
-    private long id = 0L;
     private static final int EDIT_NOTE = 3;
 
     @Override
@@ -90,7 +88,6 @@ public class NoteDetailActivity extends BaseActivity {
     @Override
     protected void initData() {
         mNoteEntity = getIntent().getParcelableExtra("Note");
-        id = mNoteEntity.getId();
     }
 
     @Override

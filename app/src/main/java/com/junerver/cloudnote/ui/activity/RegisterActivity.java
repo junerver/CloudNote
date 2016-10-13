@@ -32,7 +32,6 @@ public class RegisterActivity extends BaseActivity {
     private String mRegisterUsername;
     private String mRegisterPassword;
 
-
     @Override
     protected void initView() {}
 
