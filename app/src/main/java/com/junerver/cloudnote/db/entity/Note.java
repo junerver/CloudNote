@@ -17,6 +17,8 @@ public class Note extends BmobObject {
     private String content;
     private String image;   //图片
     private String video;   //视频
+    private String userObjId;   //用户id
+    private long dbId;
 
     public String getTitle() {
         return title;
@@ -56,5 +58,33 @@ public class Note extends BmobObject {
 
     public void setVideo(String video) {
         this.video = video;
+    }
+
+    public String getUserObjId() {
+        return userObjId;
+    }
+
+    public void setUserObjId(String userObjId) {
+        this.userObjId = userObjId;
+    }
+
+    public long getDbId() {
+        return dbId;
+    }
+
+    public void setDbId(long dbId) {
+        this.dbId = dbId;
+    }
+
+    public NoteEntity toEntity() {
+        NoteEntity entity = new NoteEntity();
+        entity.setTitle(getTitle());
+        entity.setContent(getContent());
+        entity.setSummary(getSummary());
+        entity.setImage(getImage());
+        entity.setVideo(getVideo());
+        entity.setId(getDbId());
+        entity.setDate(getUpdatedAt());
+        return entity;
     }
 }

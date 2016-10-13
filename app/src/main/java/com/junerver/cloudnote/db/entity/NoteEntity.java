@@ -201,6 +201,17 @@ public class NoteEntity implements Parcelable {
             return new NoteEntity[size];
         }
     };
+
+    public Note toBmob() {
+        Note bmobNote = new Note();
+        bmobNote.setTitle(getTitle());
+        bmobNote.setContent(getContent());
+        bmobNote.setSummary(getSummary());
+        bmobNote.setImage(getImage());
+        bmobNote.setVideo(getVideo());
+        bmobNote.setDbId(getId());
+        return bmobNote;
+    }
 }
 
 

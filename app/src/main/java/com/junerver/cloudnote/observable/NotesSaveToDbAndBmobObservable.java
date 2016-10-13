@@ -4,6 +4,7 @@ package com.junerver.cloudnote.observable;
 import com.junerver.cloudnote.CloudNoteApp;
 import com.junerver.cloudnote.db.entity.Note;
 import com.junerver.cloudnote.db.entity.NoteEntity;
+import com.junerver.cloudnote.ui.activity.MainActivity;
 import com.junerver.cloudnote.utils.NetUtils;
 import com.orhanobut.logger.Logger;
 
@@ -127,13 +128,9 @@ public class NotesSaveToDbAndBmobObservable {
 
 
     private static Note createNewBmobByEntity(NoteEntity entity) {
-        //拆entity实例 封装bmob实例
-        Note note = new Note();
-        note.setTitle(entity.getTitle());
-        note.setContent(entity.getContent());
-        note.setSummary(entity.getSummary());
-        note.setImage(entity.getImage());
-        note.setVideo(entity.getVideo());
+        //封装bmob实例
+        Note note = entity.toBmob();
+        note.setUserObjId(MainActivity.userObjId);
         return note;
     }
 }

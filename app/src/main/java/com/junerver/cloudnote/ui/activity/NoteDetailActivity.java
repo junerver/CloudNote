@@ -94,9 +94,7 @@ public class NoteDetailActivity extends BaseActivity {
     }
 
     @Override
-    protected void setListeners() {
-
-    }
+    protected void setListeners() {}
 
     @Override
     protected int getLayoutId() {

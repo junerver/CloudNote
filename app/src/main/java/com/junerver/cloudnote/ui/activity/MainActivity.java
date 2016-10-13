@@ -39,21 +39,11 @@ public class MainActivity extends BaseActivity {
     private ViewPager mViewPager ;
     private TabView mTabView ;
     private Map<Integer,Fragment> mFragmentMap ;
+    public static String userObjId = BmobUser.getCurrentUser().getObjectId();
 
 
     @Override
     protected void initView() {
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
 
         mFragmentMap = new HashMap<>() ;
         mViewPager = (ViewPager)findViewById(R.id.id_view_pager) ;

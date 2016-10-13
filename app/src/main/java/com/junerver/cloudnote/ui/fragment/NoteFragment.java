@@ -13,12 +13,15 @@ import android.widget.ImageView;
 import com.github.jdsjlzx.interfaces.OnItemClickListener;
 import com.github.jdsjlzx.recyclerview.LRecyclerView;
 import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
+import com.junerver.cloudnote.CloudNoteApp;
 import com.junerver.cloudnote.R;
 import com.junerver.cloudnote.adapter.NoteRecyclerAdapter;
+import com.junerver.cloudnote.db.entity.Note;
 import com.junerver.cloudnote.db.entity.NoteEntity;
 import com.junerver.cloudnote.observable.NotesFromDatabaseObservable;
 import com.junerver.cloudnote.observable.NotesSyncToBmobObservable;
 import com.junerver.cloudnote.ui.activity.EditNoteActivity;
+import com.junerver.cloudnote.ui.activity.MainActivity;
 import com.junerver.cloudnote.ui.activity.NoteDetailActivity;
 import com.junerver.cloudnote.utils.NetUtils;
 import com.orhanobut.logger.Logger;
@@ -28,8 +31,15 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import rx.Observable;
 import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -99,7 +109,8 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
                 break;
             case R.id.ivSync:
                 mIvSync.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.anim_sync));   //动画效果
-                NotesSyncToBmobObservable.sync()
+                synvToDb();
+                NotesSyncToBmobObservable.syncToBmob()
                         .doOnCompleted(new Action0() {
                             @Override
                             public void call() {
@@ -128,7 +139,6 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
         super.onResume();
         NotesFromDatabaseObservable.ofDate()
                 .subscribe(this);
-
     }
 
     @Override
@@ -145,6 +155,29 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
     @Override
     public void onNext(List<NoteEntity> noteEntities) {
         //从数据库获取本地数据
-        this.mNoteEntities=noteEntities;
+        this.mNoteEntities = noteEntities;
+    }
+
+    public void synvToDb() {
+        BmobQuery<Note> query = new BmobQuery<Note>();
+        query.addWhereEqualTo("userObjId", MainActivity.userObjId);
+        query.setLimit(50); //查询本用户的50条笔记
+        query.findObjects(new FindListener<Note>() {
+            @Override
+            public void done(List<Note> list, BmobException e) {
+                if (e == null) {
+                    Logger.d("共查询到：" + list.size());
+                    for (Note note : list) {
+                        NoteEntity entity = note.toEntity();
+                        entity.setObjId(note.getObjectId());
+                        CloudNoteApp.getNoteEntityDao().insertOrReplace(entity);
+                    }
+                    NotesFromDatabaseObservable.ofDate()
+                            .subscribe(NoteFragment.this);
+                } else {
+                    Logger.d("bmob查询失败：" + e.getMessage() + "," + e.getErrorCode());
+                }
+            }
+        });
     }
 }
