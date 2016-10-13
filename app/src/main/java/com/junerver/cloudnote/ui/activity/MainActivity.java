@@ -17,6 +17,7 @@ import com.junerver.cloudnote.db.entity.NoteEntity;
 import com.junerver.cloudnote.ui.fragment.ConfigFragment;
 import com.junerver.cloudnote.ui.fragment.NoteFragment;
 import com.junerver.cloudnote.ui.widget.TabView;
+import com.orhanobut.logger.Logger;
 
 import java.security.acl.NotOwnerException;
 import java.util.Date;
@@ -51,6 +52,8 @@ public class MainActivity extends BaseActivity {
         mViewPager.setAdapter(new PageAdapter(getSupportFragmentManager()));
         mTabView = (TabView)findViewById(R.id.id_tab) ;
         mTabView.setViewPager(mViewPager);
+        Logger.d("您的用户名是："+BmobUser.getCurrentUser().getUsername());
+
 
     }
 

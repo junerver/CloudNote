@@ -10,6 +10,7 @@ import com.orhanobut.logger.Logger;
 
 import java.util.Date;
 
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
@@ -130,7 +131,7 @@ public class NotesSaveToDbAndBmobObservable {
     private static Note createNewBmobByEntity(NoteEntity entity) {
         //封装bmob实例
         Note note = entity.toBmob();
-        note.setUserObjId(MainActivity.userObjId);
+        note.setUserObjId(BmobUser.getCurrentUser().getUsername());
         return note;
     }
 }

@@ -32,6 +32,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import rx.Observable;
@@ -160,7 +161,7 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
 
     public void synvToDb() {
         BmobQuery<Note> query = new BmobQuery<Note>();
-        query.addWhereEqualTo("userObjId", MainActivity.userObjId);
+        query.addWhereEqualTo("userObjId", BmobUser.getCurrentUser().getUsername());
         query.setLimit(50); //查询本用户的50条笔记
         query.findObjects(new FindListener<Note>() {
             @Override
