@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -167,7 +166,6 @@ public class EditNoteActivity extends BaseActivity implements Observer<NoteEntit
         }
     }
 
-    @NonNull
     private String getSummary(String content) {
         String summary;
         if (content.length() >= 10) {
@@ -239,7 +237,7 @@ public class EditNoteActivity extends BaseActivity implements Observer<NoteEntit
     @Override
     public void onCompleted() {
         closeProgress();
-        showShortToast("笔记保存成功");
+        showShortToast(getString(R.string.save_success));
         finish();
     }
 

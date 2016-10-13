@@ -58,14 +58,14 @@ public class RegisterActivity extends BaseActivity {
                 mRegisterPassword = mEtRegisterPassword.getText().toString().trim();
                 //都不是空
                 if (!NetUtils.isConnected(mContext)) {
-                    showShortToast("没有网络连接！！！");
+                    showShortToast(getString(R.string.no_connect));
                 } else if (TextUtils.isEmpty(mRegisterUsername)) {
                     mEtRegisterUsername.requestFocus();
-                    mEtRegisterUsername.setError("对不起，用户名不能为空");
+                    mEtRegisterUsername.setError(getString(R.string.username_nonblank));
                     return;
                 } else if (TextUtils.isEmpty(mRegisterPassword)) {
                     mEtRegisterPassword.requestFocus();
-                    mEtRegisterPassword.setError("对不起，用密码不能为空");
+                    mEtRegisterPassword.setError(getString(R.string.password_nonblank));
                     return;
                 } else {
                     showProgress();
@@ -78,11 +78,11 @@ public class RegisterActivity extends BaseActivity {
                         public void done(BmobUser s, BmobException e) {
                             closeProgress();
                             if (e == null) {
-                                showShortToast("注册成功");
+                                showShortToast(getString(R.string.register_success));
                                 startActivity(new Intent(mContext, MainActivity.class));
                                 RegisterActivity.this.finish();
                             } else {
-                                showShortToast("注册失败！换个用户名试试吧~");
+                                showShortToast(getString(R.string.register_err));
                             }
                         }
                     });

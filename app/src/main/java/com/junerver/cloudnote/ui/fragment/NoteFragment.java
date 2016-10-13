@@ -20,6 +20,7 @@ import com.junerver.cloudnote.observable.NotesFromDatabaseObservable;
 import com.junerver.cloudnote.observable.NotesSyncToBmobObservable;
 import com.junerver.cloudnote.ui.activity.EditNoteActivity;
 import com.junerver.cloudnote.ui.activity.NoteDetailActivity;
+import com.junerver.cloudnote.utils.NetUtils;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import rx.Observer;
+import rx.functions.Action0;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -94,13 +96,20 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ivMine:
-                showShortToast("我的！");
                 break;
             case R.id.ivSync:
-                // TODO: 2016/9/6  同步，启用observable将数据库的数据与后端数据对比并同步，检测数据库的objId标志，如果没有则是没有同步的内容，则将这个内容同步
-                String msg = "同步中！";
                 mIvSync.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.anim_sync));   //动画效果
                 NotesSyncToBmobObservable.sync()
+                        .doOnCompleted(new Action0() {
+                            @Override
+                            public void call() {
+                                if (NetUtils.isConnected(mContext)) {
+                                    showShortToast(mContext.getString(R.string.sync_success));
+                                } else {
+                                    showShortToast(mContext.getString(R.string.check_connect));
+                                }
+                            }
+                        })
                         .subscribe();
                 break;
         }
@@ -119,16 +128,13 @@ public class NoteFragment extends BaseFragment implements Observer<List<NoteEnti
         super.onResume();
         NotesFromDatabaseObservable.ofDate()
                 .subscribe(this);
-        mDataAdapter.notifyDataSetChanged();
-        mLRecyclerViewAdapter.notifyDataSetChanged();
+
     }
 
     @Override
     public void onCompleted() {
         //更新配适器数据
         mDataAdapter.setDataList(mNoteEntities);
-        mDataAdapter.notifyDataSetChanged();
-        mLRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override

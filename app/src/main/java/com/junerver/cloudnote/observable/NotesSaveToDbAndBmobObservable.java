@@ -1,6 +1,5 @@
 package com.junerver.cloudnote.observable;
 
-import android.support.annotation.NonNull;
 
 import com.junerver.cloudnote.CloudNoteApp;
 import com.junerver.cloudnote.db.entity.Note;
@@ -126,7 +125,7 @@ public class NotesSaveToDbAndBmobObservable {
         });
     }
 
-    @NonNull
+
     private static Note createNewBmobByEntity(NoteEntity entity) {
         //拆entity实例 封装bmob实例
         Note note = new Note();

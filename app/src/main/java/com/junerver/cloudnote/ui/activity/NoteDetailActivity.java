@@ -127,11 +127,11 @@ public class NoteDetailActivity extends BaseActivity {
                                     Logger.i("bmob数据删除成功");
                                     //清除本地数据
                                     CloudNoteApp.getNoteEntityDao().delete(mNoteEntity);
-                                    showShortToast("笔记已删除！");
+                                    showShortToast(getString(R.string.del_success));
                                     finish();
                                 } else {
-                                    Logger.i("bmob数据删除失败：" + e.getMessage() + "," + e.getErrorCode());
-                                    showShortToast("错误！请稍后再试！");
+                                    Logger.d("bmob数据删除失败：" + e.getMessage() + "," + e.getErrorCode());
+                                    showShortToast(getString(R.string.del_bmob_err));
                                 }
                             }
                         });

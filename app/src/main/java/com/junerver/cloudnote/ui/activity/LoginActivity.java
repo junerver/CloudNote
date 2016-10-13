@@ -67,14 +67,14 @@ public class LoginActivity extends BaseActivity {
 
                 //都不是空
                 if (!NetUtils.isConnected(mContext)) {
-                    showShortToast("没有网络连接！！！");
+                    showShortToast(getString(R.string.no_connect));
                 } else if (TextUtils.isEmpty(mLoginUsername)) {
                     mEtLoginUsername.requestFocus();
-                    mEtLoginUsername.setError("对不起，用户名不能为空");
+                    mEtLoginUsername.setError(getString(R.string.username_nonblank));
                     return;
                 } else if (TextUtils.isEmpty(mLoginPassword)) {
                     mEtLoginPassword.requestFocus();
-                    mEtLoginPassword.setError("对不起，用密码不能为空");
+                    mEtLoginPassword.setError(getString(R.string.password_nonblank));
                     return;
                 } else {
                     showProgress();
@@ -90,7 +90,7 @@ public class LoginActivity extends BaseActivity {
                                 startActivity(new Intent(mContext, MainActivity.class));
                                 LoginActivity.this.finish();
                             } else {
-                                showShortToast("用户名或者密码错误！！！");
+                                showShortToast(getString(R.string.user_pass_err));
                             }
                         }
                     });

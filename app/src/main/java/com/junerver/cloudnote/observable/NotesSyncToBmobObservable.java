@@ -43,7 +43,7 @@ public class NotesSyncToBmobObservable {
                                 @Override
                                 public void done(String objectId, BmobException e) {
                                     if (e == null) {
-                                        //网络数据保存成功 保存objId 修改同步位
+                                        //网络数据保存成功 保存objId 到数据库
                                         noteEntity.setObjId(objectId);
                                         noteEntity.setSync(true);
                                     } else {
@@ -58,7 +58,7 @@ public class NotesSyncToBmobObservable {
                         return note;
                     }
                 })
-                .subscribeOn(Schedulers.io())                     //io线程执行
-                .observeOn(AndroidSchedulers.mainThread());      //主线程观察
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }
