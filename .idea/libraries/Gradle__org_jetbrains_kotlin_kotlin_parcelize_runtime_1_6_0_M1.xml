@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlin:kotlin-parcelize-runtime:1.6.0-M1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-parcelize-runtime/1.6.0-M1/452cf42fa54bc33077f355ce8a14cfd91d1acd80/kotlin-parcelize-runtime-1.6.0-M1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-parcelize-runtime/1.6.0-M1/5b8f86fea035328fc9e8c660773037a3401ce25f/kotlin-parcelize-runtime-1.6.0-M1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-parcelize-runtime/1.6.0-M1/3e1a4be4f81524d169b228574eaf7cc9c049c39e/kotlin-parcelize-runtime-1.6.0-M1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

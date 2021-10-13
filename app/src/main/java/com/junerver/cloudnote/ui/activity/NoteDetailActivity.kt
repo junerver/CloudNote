@@ -1,159 +1,106 @@
-package com.junerver.cloudnote.ui.activity;
+package com.junerver.cloudnote.ui.activity
 
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.v7.app.AlertDialog;
-import android.view.InflateException;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.junerver.cloudnote.CloudNoteApp;
-import com.junerver.cloudnote.R;
-import com.junerver.cloudnote.db.dao.NoteEntityDao;
-import com.junerver.cloudnote.db.entity.Note;
-import com.junerver.cloudnote.db.entity.NoteEntity;
-import com.orhanobut.logger.Logger;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.UpdateListener;
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.ThumbnailUtils
+import android.provider.MediaStore
+import android.view.View
+import androidx.appcompat.app.AlertDialog
+import com.junerver.cloudnote.R
+import com.junerver.cloudnote.databinding.ActivityNoteDetailBinding
+import com.junerver.cloudnote.databinding.BackBarBinding
+import com.junerver.cloudnote.db.entity.Note
+import com.junerver.cloudnote.db.entity.NoteEntity
 
 /**
  * 用于查看笔记的页面
  */
+class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
 
-public class NoteDetailActivity extends BaseActivity {
+    private lateinit var mNoteEntity: NoteEntity
 
-    @BindView(R.id.tvNoteTitle)
-    TextView mTvNoteTitle;
-    @BindView(R.id.tvNoteContent)
-    TextView mTvNoteContent;
-    @BindView(R.id.btnEdit)
-    LinearLayout mBtnEdit;
-    @BindView(R.id.btnDelete)
-    LinearLayout mBtnDelete;
-    @BindView(R.id.ivBack)
-    ImageView mIvBack;
-    @BindView(R.id.ivDone)
-    ImageView mIvDone;
-    @BindView(R.id.ivImage)
-    ImageView mIvImage;
-    @BindView(R.id.ibVideo)
-    ImageButton mIbVideo;
-
-    private NoteEntity mNoteEntity;
-    private static final int EDIT_NOTE = 3;
-
-    @Override
-    protected void initView() {
-        mIvDone.setVisibility(View.GONE);
-        inflateView(mNoteEntity);
+    private lateinit var backBarBinding: BackBarBinding
+    override fun initData() {
+        mNoteEntity = intent.getParcelableExtra("Note")!!
     }
 
-    private void inflateView(NoteEntity noteEntity) {
-        String title = noteEntity.getTitle();
-        String content = noteEntity.getContent();
-        String image = noteEntity.getImage();
-        String video = noteEntity.getVideo();
+    override fun initView() {
+        backBarBinding = BackBarBinding.bind(viewBinding.llRoot)
+        backBarBinding.ivDone.visibility = View.GONE
+        inflateView(mNoteEntity)
+    }
 
+    private fun inflateView(noteEntity: NoteEntity) {
+        val title: String = noteEntity.title
+        val content: String = noteEntity.content
+        val image: String = noteEntity.image
+        val video: String = noteEntity.video
         if (title != null) {
-            mTvNoteTitle.setText(title);
+            viewBinding.tvNoteTitle.setText(title)
         }
         if (content != null) {
-            mTvNoteContent.setText(content);
+            viewBinding.tvNoteContent.setText(content)
         }
         if (image != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(image);
-            bitmap = ThumbnailUtils.extractThumbnail(bitmap, Math.max(500, mIvImage.getWidth()), Math.max(500, mIvImage.getHeight()), ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
-            mIvImage.setImageBitmap(bitmap);
+            var bitmap: Bitmap = BitmapFactory.decodeFile(image)
+            bitmap = ThumbnailUtils.extractThumbnail(
+                bitmap,
+                Math.max(500, viewBinding.ivImage.width),
+                Math.max(500, viewBinding.ivImage.height),
+                ThumbnailUtils.OPTIONS_RECYCLE_INPUT
+            )
+            viewBinding.ivImage.setImageBitmap(bitmap)
         }
         if (video != null) {
-            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND);
-            bitmap = ThumbnailUtils.extractThumbnail(bitmap, Math.max(500, mIbVideo.getWidth()), Math.max(500, mIbVideo.getHeight()), ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
-            mIbVideo.setImageBitmap(bitmap);
-        }
-
-    }
-
-    @Override
-    protected void initData() {
-        mNoteEntity = getIntent().getParcelableExtra("Note");
-    }
-
-    @Override
-    protected void setListeners() {}
-
-    @Override
-    protected int getLayoutId() {
-        return R.layout.activity_note_detail;
-    }
-
-
-    @OnClick({R.id.btnEdit, R.id.btnDelete, R.id.ivBack, R.id.ivImage, R.id.ibVideo})
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnEdit:
-                Intent editIntent = new Intent(mContext, EditNoteActivity.class);
-                editIntent.putExtra("Note", mNoteEntity);
-                startActivityForResult(editIntent, EDIT_NOTE);
-                break;
-            case R.id.btnDelete:
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("确认要删除这个笔记么？");
-                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Note note = new Note();
-                        note.setObjectId(mNoteEntity.getObjId());
-                        note.delete(new UpdateListener() {
-                            @Override
-                            public void done(BmobException e) {
-                                if (e == null) {
-                                    Logger.i("bmob数据删除成功");
-                                    //清除本地数据
-                                    CloudNoteApp.getNoteEntityDao().delete(mNoteEntity);
-                                    showShortToast(getString(R.string.del_success));
-                                    finish();
-                                } else {
-                                    Logger.d("bmob数据删除失败：" + e.getMessage() + "," + e.getErrorCode());
-                                    showShortToast(getString(R.string.del_bmob_err));
-                                }
-                            }
-                        });
-                    }
-                });
-                builder.setNegativeButton("取消", null);
-                builder.show();
-                break;
-            case R.id.ivBack:
-                finish();
-                break;
-            case R.id.ivImage:
-                //查看图片
-                break;
-            case R.id.ibVideo:
-                //查看视频
-                break;
+            var bitmap: Bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND)!!
+            bitmap = ThumbnailUtils.extractThumbnail(
+                bitmap,
+                Math.max(500, viewBinding.ibVideo.width),
+                Math.max(500, viewBinding.ibVideo.height),
+                ThumbnailUtils.OPTIONS_RECYCLE_INPUT
+            )
+            viewBinding.ibVideo.setImageBitmap(bitmap)
         }
     }
+
+    override fun setListeners() {
+        viewBinding.btnEdit.setOnClickListener {
+            val editIntent = Intent(mContext, EditNoteActivity::class.java)
+            editIntent.putExtra("Note", mNoteEntity)
+            startActivityForResult(editIntent, EDIT_NOTE)
+        }
+        viewBinding.btnDelete.setOnClickListener{
+            val builder: AlertDialog.Builder = AlertDialog.Builder(mContext)
+            builder.setTitle("确认要删除这个笔记么？")
+            builder.setPositiveButton("确认"
+            ) { _, _ ->
+                val note = Note()
+                note.objectId = mNoteEntity.objId
+                //网络请求删除
+
+                //本地数据库删除
+
+                showShortToast(getString(R.string.del_success))
+                finish()
+            }
+            builder.setNegativeButton("取消", null)
+            builder.show()
+        }
+    }
+
 
     //编辑后返回变更
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            mNoteEntity=data.getParcelableExtra("Note");
-            inflateView(mNoteEntity);
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            mNoteEntity = data?.getParcelableExtra("Note")!!
+            inflateView(mNoteEntity)
         }
+    }
+
+    companion object {
+        private const val EDIT_NOTE = 3
     }
 }

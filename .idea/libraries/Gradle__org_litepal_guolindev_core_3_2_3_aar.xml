@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: org.litepal.guolindev:core:3.2.3@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/89e7f65a1bb01fb391f5bda5667df038/jetified-core-3.2.3/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/89e7f65a1bb01fb391f5bda5667df038/jetified-core-3.2.3/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/89e7f65a1bb01fb391f5bda5667df038/jetified-core-3.2.3/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.litepal.guolindev/core/3.2.3/e9250e8e8fc4051d4f7229abf85dfa2a7850d3e2/core-3.2.3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.litepal.guolindev/core/3.2.3/17e8d5209c7347f4c042dcc9d08fcce326eac11d/core-3.2.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

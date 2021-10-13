@@ -1,51 +1,49 @@
-package com.junerver.cloudnote.ui.fragment;
+package com.junerver.cloudnote.ui.fragment
 
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-
-import com.junerver.cloudnote.R;
-import com.junerver.cloudnote.ui.activity.LoginActivity;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import cn.bmob.v3.BmobUser;
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.idealworkshops.idealschool.utils.SpUtils
+import com.junerver.cloudnote.R
+import com.junerver.cloudnote.databinding.FragmentConfigBinding
+import com.junerver.cloudnote.ui.activity.LoginActivity
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple [Fragment] subclass.
  */
-public class ConfigFragment extends BaseFragment {
+class ConfigFragment : BaseFragment() {
 
-    @BindView(R.id.ivUserAvatar)
-    ImageView mIvUserAvatar;
-    @BindView(R.id.btnInOut)
-    Button mBtnInOut;
+    private var _binding: FragmentConfigBinding? = null
 
-    @Override
-    protected void init() {
-        BmobUser bmobUser = BmobUser.getCurrentUser();
-        if (bmobUser != null) {
-            mBtnInOut.setText(R.string.login_out);
+    private val binding get() = _binding!!
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentConfigBinding.inflate(inflater, container, false)
+        init()
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+
+    private fun init() {
+        //获取用户信息
+        val userInfo = SpUtils.decodeString("USER_INFO")
+
+        if (userInfo.isNotEmpty()) {
+            binding.btnInOut.setText(R.string.login_out)
+        }
+
+        binding.btnInOut.setOnClickListener {
+            SpUtils.clearAll()
+            startActivity(Intent(activity, LoginActivity::class.java))
+            activity?.finish()
         }
     }
 
-    @Override
-    protected int getLayoutId() {
-        return R.layout.fragment_config;
-    }
-
-
-    @OnClick(R.id.btnInOut)
-    public void onClick() {
-        BmobUser.logOut();   //清除缓存用户对象
-        startActivity(new Intent(mContext, LoginActivity.class));
-        getActivity().finish();
-    }
 }
