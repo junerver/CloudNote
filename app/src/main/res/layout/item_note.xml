@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                                    xmlns:card_view="http://schemas.android.com/tools"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="80dp"
-                                    android:layout_marginBottom="2dp"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
-                                    android:layout_marginTop="2dp"
-                                    android:foreground="?android:attr/selectableItemBackground"
-                                    card_view:cardBackgroundColor="@color/cardview_light_background"
-                                    card_view:cardCornerRadius="0dp"
-                                    card_view:cardElevation="0dp"
-                                    card_view:cardUseCompatPadding="true"
-                                    app:cardCornerRadius="5dp"
-                                    app:elevation="1dp">
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginBottom="2dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardCornerRadius="5dp"
+    app:elevation="1dp"
+    card_view:cardBackgroundColor="@color/cardview_light_background"
+    card_view:cardCornerRadius="0dp"
+    card_view:cardElevation="0dp"
+    card_view:cardUseCompatPadding="true">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="26dp"
             android:layout_marginStart="26dp"
+            android:layout_marginLeft="26dp"
             android:layout_marginTop="10dp"
             android:text="今天是个好日子"
             android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -35,25 +37,25 @@
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/tvTitle"
-            android:layout_alignStart="@+id/tvTitle"
             android:layout_below="@+id/tvTitle"
+            android:layout_alignStart="@+id/tvTitle"
+            android:layout_alignLeft="@+id/tvTitle"
             android:layout_marginTop="5dp"
-            android:textColor="@color/greyblue"
             android:text="2015年12月31日 19:30"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/greyblue" />
 
         <TextView
+            android:id="@+id/tvSummary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="今天是12月31..."
-            android:id="@+id/tvSummary"
             android:layout_alignTop="@+id/tvDate"
-            android:layout_toRightOf="@+id/tvDate"
-            android:layout_toEndOf="@+id/tvDate"
+            android:layout_marginStart="18dp"
             android:layout_marginLeft="18dp"
-            android:layout_marginStart="18dp"/>
+            android:layout_toEndOf="@+id/tvDate"
+            android:layout_toRightOf="@+id/tvDate"
+            android:text="今天是12月31..."
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
 
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

@@ -1,139 +1,140 @@
 package com.junerver.cloudnote.ui.fragment
 
-import android.support.design.widget.FloatingActionButton
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import android.widget.ImageView
+import android.widget.AdapterView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.recyclerview.widget.OrientationHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
+import com.junerver.cloudnote.R
 import com.junerver.cloudnote.adapter.NoteRecyclerAdapter
+import com.junerver.cloudnote.databinding.FragmentNoteBinding
 import com.junerver.cloudnote.db.entity.Note
 import com.junerver.cloudnote.db.entity.NoteEntity
-import java.util.ArrayList
+import com.junerver.cloudnote.ui.activity.EditNoteActivity
+import com.junerver.cloudnote.ui.activity.NoteDetailActivity
+import java.util.*
 
 /**
  * A simple [Fragment] subclass.
  */
 class NoteFragment : BaseFragment() {
-    @BindView(R.id.ivMine)
-    var mIvMine: ImageView? = null
 
-    @BindView(R.id.ivSync)
-    var mIvSync: ImageView? = null
+    private var _binding: FragmentNoteBinding? = null
 
-    @BindView(R.id.rvList)
-    var mRvList: LRecyclerView? = null
+    private val binding get() = _binding!!
 
-    @BindView(R.id.fabAddNote)
-    var mFabAddNote: FloatingActionButton? = null
-    private var mLRecyclerViewAdapter: LRecyclerViewAdapter? = null
-    private var mDataAdapter: NoteRecyclerAdapter? = null
-    private var mLayoutManager: LinearLayoutManager? = null
-    private var mNoteEntities: List<NoteEntity> = ArrayList<NoteEntity>()
-
-    protected fun init() {
-        mDataAdapter = NoteRecyclerAdapter(mContext)
-        mDataAdapter.setDataList(mNoteEntities)
-        mLRecyclerViewAdapter = LRecyclerViewAdapter(mContext, mDataAdapter)
-        mRvList.setAdapter(mLRecyclerViewAdapter)
-        //设置固定大小
-        mRvList.setHasFixedSize(true)
-        //创建线性布局
-        mLayoutManager = LinearLayoutManager(mContext)
-        //垂直方向
-        mLayoutManager.setOrientation(OrientationHelper.VERTICAL)
-        //给RecyclerView设置布局管理器
-        mRvList.setLayoutManager(mLayoutManager)
-        //禁用下拉刷新
-        mRvList.setPullRefreshEnabled(false)
-        //设置点击事件
-        mLRecyclerViewAdapter.setOnItemClickListener(object : OnItemClickListener() {
-            fun onItemClick(view: View?, i: Int) {
-                val noteEntity: NoteEntity = mDataAdapter.getDataList().get(i)
-                val showIntent = Intent(mContext, NoteDetailActivity::class.java)
-                showIntent.putExtra("Note", noteEntity)
-                startActivity(showIntent)
-            }
-
-            fun onItemLongClick(view: View?, i: Int) {
-                // TODO: 2016/9/20 可以设置长按删除
-            }
-        })
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentNoteBinding.inflate(inflater, container, false)
+        init()
+        return binding.root
     }
 
-    protected val layoutId: Int
-        protected get() = R.layout.fragment_note
 
-    @OnClick([R.id.ivMine, R.id.ivSync])
-    fun onClick(view: View) {
-        when (view.id) {
-            R.id.ivMine -> {
-            }
-            R.id.ivSync -> {
-                mIvSync!!.startAnimation(
-                    AnimationUtils.loadAnimation(
-                        mContext,
-                        R.anim.anim_sync
-                    )
-                ) //动画效果
-                synvToDb()
-                NotesSyncToBmobObservable.syncToBmob()
-                    .doOnCompleted(object : Action0() {
-                        fun call() {
-                            if (NetUtils.isConnected(mContext)) {
-                                showShortToast(mContext.getString(R.string.sync_success))
-                            } else {
-                                showShortToast(mContext.getString(R.string.check_connect))
-                            }
-                        }
-                    })
-                    .subscribe()
-            }
+    private lateinit var mDataAdapter: NoteRecyclerAdapter
+    private lateinit var mLayoutManager: LinearLayoutManager
+    private var mNoteEntities: MutableList<NoteEntity> = ArrayList<NoteEntity>()
+
+    fun init() {
+        mDataAdapter = NoteRecyclerAdapter(activity)
+        mDataAdapter!!.setDataList(mNoteEntities)
+        binding.rvList.adapter = mDataAdapter
+        //设置固定大小
+        binding.rvList.setHasFixedSize(true)
+        //创建线性布局
+        mLayoutManager = LinearLayoutManager(activity)
+        //垂直方向
+        mLayoutManager.orientation = RecyclerView.VERTICAL
+        //给RecyclerView设置布局管理器
+        binding.rvList.layoutManager = mLayoutManager
+
+        //设置点击事件
+//        mLRecyclerViewAdapter.setOnItemClickListener(object : AdapterView.OnItemClickListener() {
+//            fun onItemClick(view: View?, i: Int) {
+//                val noteEntity: NoteEntity = mDataAdapter.getDataList().get(i)
+//                val showIntent = Intent(activity, NoteDetailActivity::class.java)
+//                showIntent.putExtra("Note", noteEntity)
+//                startActivity(showIntent)
+//            }
+//
+//            fun onItemLongClick(view: View?, i: Int) {
+//                // TODO: 2016/9/20 可以设置长按删除
+//            }
+//        })
+
+        //同步按钮点击事件
+        binding.ivSync.setOnClickListener {
+            binding.ivSync.startAnimation(
+                AnimationUtils.loadAnimation(
+                    activity,
+                    R.anim.anim_sync
+                )
+            ) //动画效果
+//            synvToDb()
+//            NotesSyncToBmobObservable.syncToBmob()
+//                .doOnCompleted(object : Action0() {
+//                    fun call() {
+//                        if (NetUtils.isConnected(mContext)) {
+//                            showShortToast(mContext.getString(R.string.sync_success))
+//                        } else {
+//                            showShortToast(mContext.getString(R.string.check_connect))
+//                        }
+//                    }
+//                })
+//                .subscribe()
+            //用于同步本地数据到bmob云
+            //！本地有云端无 本地无objId  直接上传
+            //本地有云端有 本地有 objId 更新云端
+            //本地无 云端有 从云端下载 （存不存在本地删除但是没有同步动作到云？ 本地删除时应该增加一个删除字段）
+        }
+        binding.fabAddNote.setOnClickListener {
+            startActivity(Intent(activity, EditNoteActivity::class.java))
         }
     }
 
-    @OnClick(R.id.fabAddNote)
-    fun onClick() {
-        //进入添加页面
-        startActivity(Intent(mContext, EditNoteActivity::class.java))
-    }
 
-    override fun onResume() {
-        super.onResume()
-        NotesFromDatabaseObservable.ofDate()
-            .subscribe(this)
-    }
+    // 从本地数据库去除数据填充到rv
+//    override fun onResume() {
+//        super.onResume()
+//        NotesFromDatabaseObservable.ofDate()
+//            .subscribe(this)
+//    }
+//
+//    fun onCompleted() {
+//        //更新配适器数据
+//        mDataAdapter.setDataList(mNoteEntities)
+//    }
+//
+//    fun onError(throwable: Throwable?) {}
+//    fun onNext(noteEntities: List<NoteEntity>) {
+//        //从数据库获取本地数据
+//        mNoteEntities = noteEntities
+//    }
 
-    fun onCompleted() {
-        //更新配适器数据
-        mDataAdapter.setDataList(mNoteEntities)
-    }
-
-    fun onError(throwable: Throwable?) {}
-    fun onNext(noteEntities: List<NoteEntity>) {
-        //从数据库获取本地数据
-        mNoteEntities = noteEntities
-    }
-
-    fun synvToDb() {
-        val query: BmobQuery<Note> = BmobQuery<Note>()
-        query.addWhereEqualTo("userObjId", BmobUser.getCurrentUser().getUsername())
-        query.setLimit(50) //查询本用户的50条笔记
-        query.findObjects(object : FindListener<Note?>() {
-            fun done(list: List<Note>, e: BmobException?) {
-                if (e == null) {
-                    Logger.d("共查询到：" + list.size)
-                    for (note in list) {
-                        val entity: NoteEntity = note.toEntity()
-                        entity.objId = note.objectId
-                        CloudNoteApp.getNoteEntityDao().insertOrReplace(entity)
-                    }
-                    NotesFromDatabaseObservable.ofDate()
-                        .subscribe(this@NoteFragment)
-                } else {
-                    Logger.d("bmob查询失败：" + e.getMessage().toString() + "," + e.getErrorCode())
-                }
-            }
-        })
-    }
+//    fun synvToDb() {
+//        val query: BmobQuery<Note> = BmobQuery<Note>()
+//        query.addWhereEqualTo("userObjId", BmobUser.getCurrentUser().getUsername())
+//        query.setLimit(50) //查询本用户的50条笔记
+//        query.findObjects(object : FindListener<Note?>() {
+//            fun done(list: List<Note>, e: BmobException?) {
+//                if (e == null) {
+//                    Logger.d("共查询到：" + list.size)
+//                    for (note in list) {
+//                        val entity: NoteEntity = note.toEntity()
+//                        entity.objId = note.objectId
+//                        CloudNoteApp.getNoteEntityDao().insertOrReplace(entity)
+//                    }
+//                    NotesFromDatabaseObservable.ofDate()
+//                        .subscribe(this@NoteFragment)
+//                } else {
+//                    Logger.d("bmob查询失败：" + e.getMessage().toString() + "," + e.getErrorCode())
+//                }
+//            }
+//        })
+//    }
 }

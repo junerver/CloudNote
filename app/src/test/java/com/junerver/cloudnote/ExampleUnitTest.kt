@@ -1,5 +1,8 @@
 package com.junerver.cloudnote
 
+import com.dslx.digtalclassboard.net.BmobMethods
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
 import java.lang.Exception
@@ -13,5 +16,12 @@ class ExampleUnitTest {
     @Throws(Exception::class)
     fun addition_isCorrect() {
         Assert.assertEquals(4, (2 + 2).toLong())
+    }
+
+    @Test
+    fun testApi() = runBlocking {
+        val resp = BmobMethods.INSTANCE.login("test", "123")
+        println(resp)
+        delay(10000)
     }
 }

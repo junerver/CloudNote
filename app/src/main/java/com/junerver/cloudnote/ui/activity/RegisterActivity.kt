@@ -5,8 +5,10 @@ import android.text.TextUtils
 import android.view.View
 import com.dslx.digtalclassboard.net.BmobMethods
 import com.edusoa.ideallecturer.createJsonRequestBody
+import com.edusoa.ideallecturer.fetchNetwork
 import com.edusoa.ideallecturer.toBean
 import com.edusoa.ideallecturer.toJson
+import com.elvishew.xlog.XLog
 import com.idealworkshops.idealschool.utils.SpUtils
 import com.junerver.cloudnote.R
 import com.junerver.cloudnote.bean.ErrorResp
@@ -46,22 +48,24 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
             } else {
                 showProgress()
                 launch {
-                    val map =
-                        mapOf("username" to mRegisterUsername, "password" to mRegisterPassword)
-                    val resp = BmobMethods.INSTANCE.register(map.toJson().createJsonRequestBody())
-                    closeProgress()
-                    if (resp.contains("error")) {
-                        val bean = resp.toBean<ErrorResp>()
-                        showShortToast(bean.error)
-                    } else {
-                        //保存用户信息
+                    fetchNetwork({
+                        val map = mapOf("username" to mRegisterUsername, "password" to mRegisterPassword)
+                        BmobMethods.INSTANCE.register(map.toJson().createJsonRequestBody())
+                    },{resp->
+                        closeProgress()
                         val userInfo = resp.toBean<UserInfoResp>()
                         userInfo.username = mRegisterUsername
                         SpUtils.encode("USER_INFO", userInfo.toJson())
                         showShortToast(getString(R.string.register_success))
                         startActivity(Intent(mContext, MainActivity::class.java))
                         finish()
-                    }
+                    },{errorBody, errorMsg, code ->
+                        closeProgress()
+                        errorBody?.let {
+                            val bean = it.toBean<ErrorResp>()
+                            showLongToast(errorMsg+bean.error)
+                        }
+                    })
                 }
             }
         }

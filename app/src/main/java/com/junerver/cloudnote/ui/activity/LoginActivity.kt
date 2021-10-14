@@ -1,16 +1,19 @@
 package com.junerver.cloudnote.ui.activity
 
-import com.junerver.cloudnote.R
-import com.junerver.cloudnote.utils.NetUtils
-import android.text.TextUtils
 import android.content.Intent
+import android.text.TextUtils
 import com.dslx.digtalclassboard.net.BmobMethods
-import com.idealworkshops.idealschool.utils.SpUtils
+import com.edusoa.ideallecturer.fetchNetwork
+import com.edusoa.ideallecturer.toBean
+import com.elvishew.xlog.XLog
+import com.junerver.cloudnote.R
+import com.junerver.cloudnote.bean.ErrorResp
 import com.junerver.cloudnote.databinding.ActivityLoginBinding
 import com.junerver.cloudnote.databinding.LoginRegisterBarBinding
+import com.junerver.cloudnote.utils.NetUtils
 import kotlinx.coroutines.launch
 
-class LoginActivity: BaseActivity<ActivityLoginBinding>(){
+class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
     private lateinit var mLoginUsername: String
     private lateinit var mLoginPassword: String
@@ -19,6 +22,7 @@ class LoginActivity: BaseActivity<ActivityLoginBinding>(){
     override fun initView() {
         loginRegisterBarBinding = LoginRegisterBarBinding.bind(viewBinding.llRoot)
     }
+
     override fun initData() {}
     override fun setListeners() {
         viewBinding.btnLogin.setOnClickListener {
@@ -38,19 +42,20 @@ class LoginActivity: BaseActivity<ActivityLoginBinding>(){
                 return@setOnClickListener
             } else {
                 showProgress()
-               launch {
-                   val resp = BmobMethods.INSTANCE.login(mLoginUsername, mLoginPassword)
-                   closeProgress()
-                   if (resp.contains("error")) {
-                       showShortToast(getString(R.string.user_pass_err))
-                   } else {
-                       //存储用户信息
-                       SpUtils.encode("USER_INFO", resp)
-                       startActivity(Intent(mContext, MainActivity::class.java))
-                   }
-
-
-               }
+                launch {
+                    fetchNetwork({
+                        BmobMethods.INSTANCE.login(mLoginUsername, mLoginPassword)
+                    }, { result ->
+                        XLog.d(result)
+                        closeProgress()
+                    }, {errorBody, errorMsg, code ->
+                        closeProgress()
+                        errorBody?.let {
+                            val bean = it.toBean<ErrorResp>()
+                            showLongToast(errorMsg+bean.error)
+                        }
+                    })
+                }
             }
         }
         viewBinding.tvRegister.setOnClickListener {

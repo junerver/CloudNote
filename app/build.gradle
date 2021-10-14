@@ -51,5 +51,13 @@ dependencies {
     implementation 'com.tencent:mmkv-static:1.2.10'
 
     implementation 'org.litepal.guolindev:core:3.2.3'
+
+    implementation 'com.drakeet.multitype:multitype:4.3.0'
+
+    implementation('com.github.ihsanbal:LoggingInterceptor:3.1.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+
+    implementation 'com.elvishew:xlog:1.10.1'
 }
 

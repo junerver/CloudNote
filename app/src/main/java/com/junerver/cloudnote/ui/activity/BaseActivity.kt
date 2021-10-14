@@ -101,6 +101,14 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() , CoroutineS
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
+
+    /**
+     * @param msg toast的提示信息
+     */
+    protected fun showLongToast(msg: String?) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+    }
+
     /**
      * 打开进度条dialog
      */

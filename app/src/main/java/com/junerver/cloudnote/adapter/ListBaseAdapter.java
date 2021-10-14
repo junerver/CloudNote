@@ -1,10 +1,11 @@
 package com.junerver.cloudnote.adapter;
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.edusoa.ideallecturer.ExtensionsKt;
 import com.junerver.cloudnote.db.entity.NoteEntity;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;

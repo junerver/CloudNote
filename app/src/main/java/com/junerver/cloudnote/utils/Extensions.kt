@@ -3,8 +3,8 @@ package com.edusoa.ideallecturer
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.ParseException
 import android.net.Uri
 import android.os.Build
 import android.text.Editable
@@ -14,21 +14,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
-import okhttp3.MediaType
+import kotlinx.coroutines.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONException
+import retrofit2.HttpException
 import java.io.File
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.util.regex.Pattern
+import javax.net.ssl.SSLHandshakeException
 
 fun Context.getDrawableRes(@DrawableRes id: Int): Drawable {
     return ContextCompat.getDrawable(this, id)!!
@@ -173,7 +179,8 @@ fun Context.getUriForFile(file: File): Uri {
  * @return
  */
 inline fun <reified T> Context.getMeteData(key: String, def: T): T {
-    val applicationInfo = this.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+    val applicationInfo =
+        this.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
     val data = applicationInfo.metaData.get(key)
     return when (T::class) {
         Int::class -> data as Int
@@ -280,8 +287,10 @@ fun EditText.setOnlyDecimal() {
             }
         }
 
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int,
-                                       after: Int) {
+        override fun beforeTextChanged(
+            s: CharSequence, start: Int, count: Int,
+            after: Int
+        ) {
         }
 
         override fun afterTextChanged(s: Editable) {
@@ -423,28 +432,95 @@ fun String.safeConvertToShort(): Short {
 }
 
 /** json相关 **/
-fun Any.toJson(dateFormat: String = "yyyy-MM-dd HH:mm:ss", lenient: Boolean = false, excludeFields: List<String>? = null)
-        = GsonBuilder().setDateFormat(dateFormat)
+fun Any.toJson(
+    dateFormat: String = "yyyy-MM-dd HH:mm:ss",
+    lenient: Boolean = false,
+    excludeFields: List<String>? = null
+) = GsonBuilder().setDateFormat(dateFormat)
     .apply {
-        if(lenient) setLenient()
-        if(!excludeFields.isNullOrEmpty()){
+        if (lenient) setLenient()
+        if (!excludeFields.isNullOrEmpty()) {
             setExclusionStrategies(object : ExclusionStrategy {
                 override fun shouldSkipField(f: FieldAttributes?): Boolean {
-                    return f!=null && excludeFields.contains(f.name)
+                    return f != null && excludeFields.contains(f.name)
                 }
+
                 override fun shouldSkipClass(clazz: Class<*>?) = false
             })
         }
     }
     .create().toJson(this)!!
 
-inline fun <reified T> String.toBean(dateFormat: String = "yyyy-MM-dd HH:mm:ss", lenient: Boolean = false)
-        = GsonBuilder().setDateFormat(dateFormat)
+inline fun <reified T> String.toBean(
+    dateFormat: String = "yyyy-MM-dd HH:mm:ss",
+    lenient: Boolean = false
+) = GsonBuilder().setDateFormat(dateFormat)
     .apply {
-        if(lenient) setLenient()
+        if (lenient) setLenient()
     }.create()
     .fromJson<T>(this, object : TypeToken<T>() {}.type)!!
 
-val MEDIA_TYPE_JSON = MediaType.parse("Content-Type, application/json")
 
-fun String.createJsonRequestBody(): RequestBody = RequestBody.create(MEDIA_TYPE_JSON,this)
+inline fun String.createJsonRequestBody(): RequestBody =
+    this.toRequestBody("Content-Type, application/json".toMediaTypeOrNull())
+
+/**
+ * @Description 针对retrofit挂起函数的封装，内部封装好了协程的切换与错误处理
+ * @Author Junerver
+ * Created at 2021/10/14 07:20
+ * @param doNetwork 网络请求 一般只需要一个语句即可 比如：BmobMethods.INSTANCE.login(mLoginUsername, mLoginPassword)
+ * @param onSuccess 网络请求成功后的返回值，因为我全局封装的返回值都是string 所以不使用泛型
+ * @param onHttpError 出现httperror的回调 会取出code 与 body
+ * @return
+ */
+suspend inline fun fetchNetwork(
+    crossinline doNetwork: suspend CoroutineScope. () -> String,
+    crossinline onSuccess: (result: String) -> Unit,
+    crossinline onHttpError: (errorBody:String?, errorMsg: String, code: Int?) -> Unit
+) {
+    try {
+        //该函数集成父协程的CoroutineScope
+        coroutineScope {
+            val network = async(Dispatchers.IO) { doNetwork() }
+            val result = network.await()
+            launch(Dispatchers.Main) {
+                if (result.contains("error") && result.contains("code")) {
+                    onHttpError(result, "", 200)
+                    return@launch
+                } else {
+                    onSuccess(result)
+                }
+            }
+        }
+    } catch (e: Exception) {
+        var code = -1
+        //非http异常没有errorBody 故为可空
+        var errorBody:String? = null
+        val errorMsg = when (e) {
+            is HttpException -> {
+                errorBody = e.response()?.errorBody()?.string()
+                code = e.code()
+                when (e.code()) {
+                    400 -> "错误的请求"
+                    401 -> "文件未授权或证书错误"
+                    403 -> "服务器拒绝请求"
+                    404 -> "服务器找不到请求的文件"
+                    408 -> "请求超时，服务器未响应"
+                    500 -> "服务器遇到错误，无法完成请求。"
+                    502 -> "服务器从上游服务器收到无效响应。"
+                    503 -> "服务器目前无法使用"
+                    504 -> "服务器从上游服务器获取数据超时"
+                    else -> "服务器错误"
+                }
+            }
+            is ParseException -> "json格式错误"
+            is JSONException -> "json解析错误"
+            is JsonParseException -> "json参数错误"
+            is SSLHandshakeException -> "证书验证失败"
+            is SocketTimeoutException -> "连接超时"
+            is UnknownHostException -> "网络链接失败"
+            else -> e.message ?: "未知错误"
+        }
+        onHttpError(errorBody,errorMsg, code)
+    }
+}
