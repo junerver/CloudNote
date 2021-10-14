@@ -78,7 +78,7 @@ object BmobMethods {
         //查询单条数据
         @Headers("Content-Type: application/json")
         @GET("1/classes/Note")
-        suspend fun getAllNoteBy(): String
+        suspend fun getAllNoteByUserId(@Query("where") where:String ): String
 
         //创建单条数据
         @Headers("Content-Type: application/json")

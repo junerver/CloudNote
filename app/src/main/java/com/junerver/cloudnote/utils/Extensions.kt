@@ -32,6 +32,7 @@ import org.json.JSONException
 import retrofit2.HttpException
 import java.io.File
 import java.net.SocketTimeoutException
+import java.net.URLEncoder
 import java.net.UnknownHostException
 import java.util.regex.Pattern
 import javax.net.ssl.SSLHandshakeException
@@ -523,4 +524,9 @@ suspend inline fun fetchNetwork(
         }
         onHttpError(errorBody, errorMsg, code)
     }
+}
+
+fun String.urlEncode(): String {
+    val encode:String = URLEncoder.encode(this, "utf-8")
+    return encode.replace("%3A", ":").replace("%2F", "/")
 }

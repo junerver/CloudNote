@@ -91,6 +91,7 @@ class NoteFragment : BaseFragment() {
             //！本地有云端无 本地无objId  直接上传
             //本地有云端有 本地有 objId 更新云端
             //本地无 云端有 从云端下载 （存不存在本地删除但是没有同步动作到云？ 本地删除时应该增加一个删除字段）
+            //数据全部合并处理完成后显示出来
         }
         binding.fabAddNote.setOnClickListener {
             startActivity(Intent(activity, EditNoteActivity::class.java))

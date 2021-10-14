@@ -4,6 +4,7 @@ import com.dslx.digtalclassboard.net.BmobMethods
 import com.edusoa.ideallecturer.createJsonRequestBody
 import com.edusoa.ideallecturer.toBean
 import com.edusoa.ideallecturer.toJson
+import com.edusoa.ideallecturer.urlEncode
 import com.edusoa.ideallecturer.utils.TimeUtils.convertToTimestamp
 import com.junerver.cloudnote.db.entity.Note
 import kotlinx.coroutines.delay
@@ -49,7 +50,10 @@ class ExampleUnitTest {
 //        val resp = BmobMethods.INSTANCE.delNoteById("8f6b56bbdd")
         //{"msg":"ok"}  //重复删除则400
 
-        val resp = BmobMethods.INSTANCE.getAllNoteBy()
+        //查询某个用户的全部数据
+        val map = mapOf("userObjId" to "testw")
+        val resp = BmobMethods.INSTANCE.getAllNoteByUserId(map.toJson())
+        //{"results":[{"content":"123456","createdAt":"2021-10-13 11:37:04","dbId":1634096224294,"objectId":"edbeac9ca2","summary":"123456","title":"123456","updatedAt":"2021-10-13 11:37:04","userObjId":"testw"}]}
 
         println(resp)
         delay(10000)
