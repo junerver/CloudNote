@@ -41,4 +41,9 @@ class NoteEntity : LitePalSupport(), Parcelable {
 
     //是否已经同步
     var isSync = false
+
+    //是否本地删除，当删除时本地云端需要一同删除，如果云端没有删除成功，本地修改字段
+    var isLocalDel = false
+
+
 }

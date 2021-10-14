@@ -6,6 +6,7 @@ import com.junerver.cloudnote.R
 import android.content.Intent
 import android.os.Handler
 import com.idealworkshops.idealschool.utils.SpUtils
+import com.junerver.cloudnote.Constants
 import com.junerver.cloudnote.ui.activity.MainActivity
 import com.junerver.cloudnote.ui.activity.LoginActivity
 
@@ -26,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
         get() {
 
             //获取本地磁盘缓存的用户信息
-            val bmobUser = SpUtils.decodeString("USER_INFO")
+            val bmobUser = SpUtils.decodeString(Constants.SP_USER_INFO)
 
             if (bmobUser.isNotEmpty()) {
                 // 允许用户使用应用

@@ -6,12 +6,8 @@ import com.ihsanbal.logging.LoggingInterceptor
 import com.junerver.cloudnote.Constants
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import okhttp3.internal.platform.Platform
-import retrofit2.Call
-import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.*
 import java.util.concurrent.TimeUnit
@@ -44,7 +40,7 @@ object BmobMethods {
                     .build()
                 chain.proceed(request)
             }
-            .addInterceptor(httpLoggingInterceptor)
+//            .addInterceptor(httpLoggingInterceptor)
         mRetrofit = Retrofit.Builder()
             .client(builder.build())
             .addConverterFactory(ScalarsConverterFactory.create())
@@ -79,7 +75,30 @@ object BmobMethods {
             @Body body: RequestBody
         ): String
 
+        //查询单条数据
+        @Headers("Content-Type: application/json")
+        @GET("1/classes/Note")
+        suspend fun getAllNoteBy(): String
 
+        //创建单条数据
+        @Headers("Content-Type: application/json")
+        @POST("1/classes/Note")
+        suspend fun postNote(@Body body: RequestBody): String
+
+        //查询单条数据
+        @Headers("Content-Type: application/json")
+        @GET("1/classes/Note/{id}")
+        suspend fun getNoteById(@Path("id") id: String): String
+
+        //更新单条数据
+        @Headers("Content-Type: application/json")
+        @PUT("1/classes/Note/{id}")
+        suspend fun putNoteById(@Path("id") id: String, @Body body: RequestBody): String
+
+        //查询单条数据
+        @Headers("Content-Type: application/json")
+        @DELETE("1/classes/Note/{id}")
+        suspend fun delNoteById(@Path("id") id: String): String
     }
 }
 

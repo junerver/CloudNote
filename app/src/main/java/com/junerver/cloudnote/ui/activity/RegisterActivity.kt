@@ -10,6 +10,7 @@ import com.edusoa.ideallecturer.toBean
 import com.edusoa.ideallecturer.toJson
 import com.elvishew.xlog.XLog
 import com.idealworkshops.idealschool.utils.SpUtils
+import com.junerver.cloudnote.Constants
 import com.junerver.cloudnote.R
 import com.junerver.cloudnote.bean.ErrorResp
 import com.junerver.cloudnote.bean.UserInfoResp
@@ -55,7 +56,8 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
                         closeProgress()
                         val userInfo = resp.toBean<UserInfoResp>()
                         userInfo.username = mRegisterUsername
-                        SpUtils.encode("USER_INFO", userInfo.toJson())
+                        SpUtils.encode(Constants.SP_USER_INFO, userInfo.toJson())
+                        SpUtils.encode(Constants.SP_USER_ID,userInfo.objectId)
                         showShortToast(getString(R.string.register_success))
                         startActivity(Intent(mContext, MainActivity::class.java))
                         finish()

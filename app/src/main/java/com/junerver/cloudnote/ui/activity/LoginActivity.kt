@@ -5,9 +5,13 @@ import android.text.TextUtils
 import com.dslx.digtalclassboard.net.BmobMethods
 import com.edusoa.ideallecturer.fetchNetwork
 import com.edusoa.ideallecturer.toBean
+import com.edusoa.ideallecturer.toJson
 import com.elvishew.xlog.XLog
+import com.idealworkshops.idealschool.utils.SpUtils
+import com.junerver.cloudnote.Constants
 import com.junerver.cloudnote.R
 import com.junerver.cloudnote.bean.ErrorResp
+import com.junerver.cloudnote.bean.UserInfoResp
 import com.junerver.cloudnote.databinding.ActivityLoginBinding
 import com.junerver.cloudnote.databinding.LoginRegisterBarBinding
 import com.junerver.cloudnote.utils.NetUtils
@@ -48,6 +52,11 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
                     }, { result ->
                         XLog.d(result)
                         closeProgress()
+                        val userInfo = result.toBean<UserInfoResp>()
+                        SpUtils.encode(Constants.SP_USER_INFO, userInfo.toJson())
+                        SpUtils.encode(Constants.SP_USER_ID,userInfo.objectId)
+                        startActivity(Intent(mContext, MainActivity::class.java))
+                        finish()
                     }, {errorBody, errorMsg, code ->
                         closeProgress()
                         errorBody?.let {

@@ -10,4 +10,14 @@ object Constants {
 
     //数据库名称
     const val DB_NAME = "cloudnote"
+
+    //用户的全部字段信息 对应UserInfoResp对象
+    const val SP_USER_INFO = "USER_INFO"
+
+    //用户id 用去其他请求快速读取
+    const val SP_USER_ID = "USER_ID"
+
+    //序列化时默认排除字段
+    val DEFAULT_EXCLUDE_FIELDS: List<String> =
+        listOf("objectId", "updatedAt", "createdAt", "_updatedTime", "_createdTime")
 }

@@ -476,7 +476,7 @@ inline fun String.createJsonRequestBody(): RequestBody =
 suspend inline fun fetchNetwork(
     crossinline doNetwork: suspend CoroutineScope. () -> String,
     crossinline onSuccess: (result: String) -> Unit,
-    crossinline onHttpError: (errorBody:String?, errorMsg: String, code: Int?) -> Unit
+    crossinline onHttpError: (errorBody: String?, errorMsg: String, code: Int?) -> Unit
 ) {
     try {
         //该函数集成父协程的CoroutineScope
@@ -495,7 +495,7 @@ suspend inline fun fetchNetwork(
     } catch (e: Exception) {
         var code = -1
         //非http异常没有errorBody 故为可空
-        var errorBody:String? = null
+        var errorBody: String? = null
         val errorMsg = when (e) {
             is HttpException -> {
                 errorBody = e.response()?.errorBody()?.string()
@@ -521,6 +521,6 @@ suspend inline fun fetchNetwork(
             is UnknownHostException -> "网络链接失败"
             else -> e.message ?: "未知错误"
         }
-        onHttpError(errorBody,errorMsg, code)
+        onHttpError(errorBody, errorMsg, code)
     }
 }

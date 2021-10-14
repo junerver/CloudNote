@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.idealworkshops.idealschool.utils.SpUtils
+import com.junerver.cloudnote.Constants
 import com.junerver.cloudnote.R
 import com.junerver.cloudnote.databinding.FragmentConfigBinding
 import com.junerver.cloudnote.ui.activity.LoginActivity
@@ -33,7 +34,7 @@ class ConfigFragment : BaseFragment() {
 
     private fun init() {
         //获取用户信息
-        val userInfo = SpUtils.decodeString("USER_INFO")
+        val userInfo = SpUtils.decodeString(Constants.SP_USER_INFO)
 
         if (userInfo.isNotEmpty()) {
             binding.btnInOut.setText(R.string.login_out)

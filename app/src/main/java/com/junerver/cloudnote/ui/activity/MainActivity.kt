@@ -43,10 +43,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         return fragment!!
     }
 
-    protected fun getLayoutId(): Int {
-        return R.layout.activity_main
-    }
-
     internal inner class PageAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm),
         TabView.OnItemIconTextSelectListener {
         override fun getItem(position: Int): Fragment {
