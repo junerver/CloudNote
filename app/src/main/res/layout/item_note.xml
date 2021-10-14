@@ -11,6 +11,7 @@
     android:foreground="?android:attr/selectableItemBackground"
     app:cardCornerRadius="5dp"
     app:elevation="1dp"
+    android:id="@+id/root"
     card_view:cardBackgroundColor="@color/cardview_light_background"
     card_view:cardCornerRadius="0dp"
     card_view:cardElevation="0dp"

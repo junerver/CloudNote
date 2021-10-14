@@ -1,8 +1,6 @@
 package com.junerver.cloudnote.db.entity
 
 import com.edusoa.ideallecturer.utils.TimeUtils.convertToTimestamp
-import com.google.gson.annotations.Expose
-import com.junerver.cloudnote.db.entity.NoteEntity
 
 /**
  * Created by junerver on 2016/9/1.
@@ -12,50 +10,82 @@ import com.junerver.cloudnote.db.entity.NoteEntity
  */
 class Note {
     //标题
-    var title: String=""
+    var title: String = ""
 
     //简介
-    var summary: String=""
+    var summary: String = ""
 
     //正文
-    var content: String=""
+    var content: String = ""
 
     //图片路径
-    var image: String=""
+    var image: String = ""
 
     //视频路径
-    var video: String=""
+    var video: String = ""
 
     //上传用户的objid
-    var userObjId: String=""
+    var userObjId: String = ""
 
     //数据库id
     var dbId: Long = 0
 
     //bmob内部字段 id
-    @Expose(serialize = false, deserialize = true)
-    var objectId:String =""
+    var objectId: String = ""
 
     //bmob内部字段 更新时间
-    @Expose(serialize = false, deserialize = true)
-    var updatedAt=""
+    var updatedAt = ""
         set(value) {
             field = value
-            _updatedTime = value.convertToTimestamp()
+            updatedTime = value.convertToTimestamp()
         }
 
     //bmob内部字段 创建时间
-    @Expose(serialize = false, deserialize = true)
-    var createdAt=""
+    var createdAt = ""
         set(value) {
             field = value
-            _createdTime = value.convertToTimestamp()
+            createdTime = value.convertToTimestamp()
         }
 
     //幕后字段用于对比更新
-    @Expose(serialize = false, deserialize = false)
-    var _updatedTime:Long =-1L
+    var updatedTime: Long = -1L
+        get() {
+            //本字段未赋值时被调用
+            return if (updatedAt.isNotEmpty() and (field == -1L)) {
+                updatedAt.convertToTimestamp()
+            } else {
+                field
+            }
+        }
 
-    @Expose(serialize = false, deserialize = false)
-    var _createdTime:Long =-1L
+    var createdTime: Long = -1L
+
+
+    override fun toString(): String {
+        return "Note(title='$title', summary='$summary', content='$content', image='$image', video='$video', userObjId='$userObjId', dbId=$dbId, objectId='$objectId', updatedAt='$updatedAt', createdAt='$createdAt', _updatedTime=$updatedTime, _createdTime=$createdTime)"
+    }
+
+    fun toEntity(): NoteEntity {
+        val entity = NoteEntity()
+        entity.content = this.content
+        entity.id = this.dbId
+        entity.title = this.title
+        entity.summary = this.summary
+        entity.image = this.image
+        entity.video = this.video
+        entity.createdTime = this.createdTime
+        entity.updatedTime = this.updatedTime
+        return entity
+    }
+
+    fun update(entity: NoteEntity) {
+        this.title = entity.title
+        this.content = entity.content
+        this.summary = entity.summary
+        this.dbId = entity.id
+        this.image = entity.image
+        this.video = entity.video
+        this.createdTime = entity.createdTime
+        this.updatedTime =entity.updatedTime
+    }
 }

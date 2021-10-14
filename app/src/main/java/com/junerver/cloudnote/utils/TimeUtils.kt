@@ -327,7 +327,7 @@ object TimeUtils {
      */
 
     @SuppressLint("SimpleDateFormat")
-    fun Long.dateToString(format: String = "yyyy-MM-dd HH:mm:ss"): String? {
+    fun Long.formatToTimeString(format: String = "yyyy-MM-dd HH:mm:ss"): String? {
         try {
             return SimpleDateFormat(format).format(this)
         } catch (e: Exception) {
@@ -341,7 +341,7 @@ object TimeUtils {
      */
 
     @SuppressLint("SimpleDateFormat")
-    fun Date.dateToString(format: String = "yyyy-MM-dd HH:mm:ss"): String? {
+    fun Date.formatToTimeString(format: String = "yyyy-MM-dd HH:mm:ss"): String? {
         try {
             return SimpleDateFormat(format).format(this.time)
         } catch (e: Exception) {
@@ -359,10 +359,10 @@ object TimeUtils {
         return System.currentTimeMillis() / 1000
     }
 
-    fun String.timestampToString(format: String = "yyyy-MM-dd HH:mm:ss"): String? {
+    fun String.timestampStrFormat(format: String = "yyyy-MM-dd HH:mm:ss"): String? {
         return try {
             val time = this.toLong()
-            time.dateToString(format)
+            time.formatToTimeString(format)
         } catch (e: Exception) {
             null
         }
@@ -384,7 +384,7 @@ object TimeUtils {
     }
 
     fun isMorning(): Boolean {
-        return currentTimeMillis().dateToString("HH:mm")!!.substring(0..1).toInt() < 12
+        return currentTimeMillis().formatToTimeString("HH:mm")!!.substring(0..1).toInt() < 12
     }
 
     /**
@@ -396,7 +396,7 @@ object TimeUtils {
      * @return
      */
     fun timeToInt(): Int {
-        return currentTimeMillis().dateToString("HHmm")!!.toInt()
+        return currentTimeMillis().formatToTimeString("HHmm")!!.toInt()
     }
 
     /**

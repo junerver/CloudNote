@@ -21,12 +21,14 @@ import com.elvishew.xlog.interceptor.BlacklistTagsFilterInterceptor
 
 import com.elvishew.xlog.LogConfiguration
 import com.elvishew.xlog.printer.Printer
+import org.litepal.LitePal
 
 
 class CloudNoteApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        LitePal.initialize(this)
         MMKV.initialize(this)
         XLog.init(LogLevel.ALL)
         initXlog()

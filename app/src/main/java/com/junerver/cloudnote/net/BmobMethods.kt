@@ -40,7 +40,7 @@ object BmobMethods {
                     .build()
                 chain.proceed(request)
             }
-//            .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor(httpLoggingInterceptor)
         mRetrofit = Retrofit.Builder()
             .client(builder.build())
             .addConverterFactory(ScalarsConverterFactory.create())

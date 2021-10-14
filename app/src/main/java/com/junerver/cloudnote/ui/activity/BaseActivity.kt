@@ -9,9 +9,7 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.viewbinding.ViewBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import java.lang.Exception
 import java.lang.reflect.ParameterizedType
 import kotlin.coroutines.CoroutineContext
@@ -19,13 +17,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * Created by Junerver on 2016/8/31.
  */
-abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() , CoroutineScope {
-    lateinit var job: Job
-    // CoroutineScope 的实现
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
-
-
+abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() , CoroutineScope by MainScope() {
 
     protected lateinit var mContext: Context
     private var mProgressDialog: ProgressDialog? = null
@@ -33,7 +25,6 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() , CoroutineS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mContext = this
-        job = Job()
         initContentView()
         initData()
         initView()
@@ -91,7 +82,7 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() , CoroutineS
         super.onDestroy()
         // 当 Activity 销毁的时候取消该 Scope 管理的 job。
         // 这样在该 Scope 内创建的子 Coroutine 都会被自动的取消。
-        job.cancel()
+        cancel()
     }
 
     /**

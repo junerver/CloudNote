@@ -9,6 +9,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageView
+import com.edusoa.ideallecturer.utils.TimeUtils
 import com.junerver.cloudnote.R
 import com.junerver.cloudnote.databinding.ActivityEditNoteBinding
 import com.junerver.cloudnote.db.entity.NoteEntity
@@ -34,7 +35,7 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
     private val id = 0L //id
     override fun initView() {}
     override fun initData() {
-        mNoteEntity = intent.getParcelableExtra("Note")!!
+        mNoteEntity = intent.getParcelableExtra("Note")
         if (mNoteEntity != null) {
             //不为空说明是编辑
             isNew = false
@@ -112,7 +113,7 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
             noteEntity.title = title
             noteEntity.content = content
             noteEntity.summary = summary
-            noteEntity.date = stringDate
+            noteEntity.updatedTime = TimeUtils.currentTimeSecond()
 //            NotesSaveToDbAndBmobObservable.save(noteEntity, isNew)
 //                .subscribe(this)
             //数据同时上传云端与数据库

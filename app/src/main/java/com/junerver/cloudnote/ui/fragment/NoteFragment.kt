@@ -6,18 +6,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import android.widget.AdapterView
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.OrientationHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
+import com.drakeet.multitype.MultiTypeAdapter
+import com.dslx.digtalclassboard.net.BmobMethods
+import com.edusoa.ideallecturer.createJsonRequestBody
+import com.edusoa.ideallecturer.toBean
+import com.edusoa.ideallecturer.toJson
+import com.elvishew.xlog.XLog
+import com.idealworkshops.idealschool.utils.SpUtils
+import com.junerver.cloudnote.Constants
 import com.junerver.cloudnote.R
-import com.junerver.cloudnote.adapter.NoteRecyclerAdapter
+import com.junerver.cloudnote.adapter.NoteViewBinder
+import com.junerver.cloudnote.bean.GetAllNoteResp
+import com.junerver.cloudnote.bean.PostResp
+import com.junerver.cloudnote.bean.PutResp
 import com.junerver.cloudnote.databinding.FragmentNoteBinding
-import com.junerver.cloudnote.db.entity.Note
-import com.junerver.cloudnote.db.entity.NoteEntity
+import com.junerver.cloudnote.db.NoteUtils
 import com.junerver.cloudnote.ui.activity.EditNoteActivity
-import com.junerver.cloudnote.ui.activity.NoteDetailActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -26,24 +37,26 @@ import java.util.*
 class NoteFragment : BaseFragment() {
 
     private var _binding: FragmentNoteBinding? = null
-
     private val binding get() = _binding!!
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    private lateinit var mLayoutManager: LinearLayoutManager
+    private val adapter = MultiTypeAdapter()
+    private val items = ArrayList<Any>()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentNoteBinding.inflate(inflater, container, false)
         init()
         return binding.root
     }
 
+    private fun init() {
 
-    private lateinit var mDataAdapter: NoteRecyclerAdapter
-    private lateinit var mLayoutManager: LinearLayoutManager
-    private var mNoteEntities: MutableList<NoteEntity> = ArrayList<NoteEntity>()
-
-    fun init() {
-        mDataAdapter = NoteRecyclerAdapter(activity)
-        mDataAdapter!!.setDataList(mNoteEntities)
-        binding.rvList.adapter = mDataAdapter
+        adapter.register(NoteViewBinder())
+        binding.rvList.adapter = adapter
         //设置固定大小
         binding.rvList.setHasFixedSize(true)
         //创建线性布局
@@ -52,90 +65,136 @@ class NoteFragment : BaseFragment() {
         mLayoutManager.orientation = RecyclerView.VERTICAL
         //给RecyclerView设置布局管理器
         binding.rvList.layoutManager = mLayoutManager
+        adapter.items = items
 
-        //设置点击事件
-//        mLRecyclerViewAdapter.setOnItemClickListener(object : AdapterView.OnItemClickListener() {
-//            fun onItemClick(view: View?, i: Int) {
-//                val noteEntity: NoteEntity = mDataAdapter.getDataList().get(i)
-//                val showIntent = Intent(activity, NoteDetailActivity::class.java)
-//                showIntent.putExtra("Note", noteEntity)
-//                startActivity(showIntent)
-//            }
-//
-//            fun onItemLongClick(view: View?, i: Int) {
-//                // TODO: 2016/9/20 可以设置长按删除
-//            }
-//        })
 
         //同步按钮点击事件
         binding.ivSync.setOnClickListener {
             binding.ivSync.startAnimation(
+                //动画效果
                 AnimationUtils.loadAnimation(
                     activity,
                     R.anim.anim_sync
                 )
-            ) //动画效果
-//            synvToDb()
-//            NotesSyncToBmobObservable.syncToBmob()
-//                .doOnCompleted(object : Action0() {
-//                    fun call() {
-//                        if (NetUtils.isConnected(mContext)) {
-//                            showShortToast(mContext.getString(R.string.sync_success))
-//                        } else {
-//                            showShortToast(mContext.getString(R.string.check_connect))
-//                        }
-//                    }
-//                })
-//                .subscribe()
-            //用于同步本地数据到bmob云
-            //！本地有云端无 本地无objId  直接上传
-            //本地有云端有 本地有 objId 更新云端
-            //本地无 云端有 从云端下载 （存不存在本地删除但是没有同步动作到云？ 本地删除时应该增加一个删除字段）
-            //数据全部合并处理完成后显示出来
+            )
+            syncToDb()
+
         }
         binding.fabAddNote.setOnClickListener {
             startActivity(Intent(activity, EditNoteActivity::class.java))
         }
+        listAllFromDb()
     }
 
 
-    // 从本地数据库去除数据填充到rv
-//    override fun onResume() {
-//        super.onResume()
-//        NotesFromDatabaseObservable.ofDate()
-//            .subscribe(this)
-//    }
-//
-//    fun onCompleted() {
-//        //更新配适器数据
-//        mDataAdapter.setDataList(mNoteEntities)
-//    }
-//
-//    fun onError(throwable: Throwable?) {}
-//    fun onNext(noteEntities: List<NoteEntity>) {
-//        //从数据库获取本地数据
-//        mNoteEntities = noteEntities
-//    }
+    private fun syncToDb() {
+        lifecycleScope.launch {
+            //sync to db
+            flow {
+                val map = mapOf("userObjId" to SpUtils.decodeString(Constants.SP_USER_ID))
+                println(map)
+                val resp = BmobMethods.INSTANCE.getAllNoteByUserId(map.toJson())
+                emit(resp)
+            }.map {
+                println()
+                println("${Thread.currentThread().name}: $it")
+                val allNote = it.toBean<GetAllNoteResp>()
+                allNote
+            }.flatMapConcat {
+                it.results.asFlow()
+            }.onEach { note ->
+                //云端的每一条笔记
+                val objId = note.objectId
+                val dbId = note.dbId
+                val dbBean = NoteUtils.queryNoteById(dbId)
+                if (dbBean == null) {
+                    //本地没有次数据 新建本地数据并保存数据库
+                    val entity = note.toEntity()
+                    entity.save()
+                }
+                //存在本地对象 对比是否跟新 or 删除
+                dbBean?.let {
+                    if (it.isLocalDel) {
+                        //本地删除
+                        val resp = BmobMethods.INSTANCE.delNoteById(it.objId)
+                        if (resp.contains("ok")) {
+                            //远端删除成功 本地删除
+                            it.delete()
+                        }
+                        return@let
+                    }
+                    //未本地删除对比数据相互更新
+                    when {
+                        note.updatedTime > it.updatedTime -> {
+                            //云端内容更新更新本地数据
+                            it.update(note)
+                        }
+                        note.updatedTime < it.updatedTime -> {
+                            //云端数据小于本地 更新云端
+                            note.update(it)
+                            val resp = BmobMethods.INSTANCE.putNoteById(
+                                objId,
+                                note.toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
+                                    .createJsonRequestBody()
+                            )
+                            val putResp = resp.toBean<PutResp>()
+                        }
+                        else -> {
+                            //数据相同
+                            //do nothing
+                        }
+                    }
+                    it.isSync = true
+                    it.saveOrUpdate()
+                }
+            }.flowOn(Dispatchers.IO).onCompletion {
+                //完成时调用与末端流操作符处于同一个协程上下文范围
+                syncToBmob()
+            }.collect {
+                println()
+                println("${Thread.currentThread().name}: $it")
+            }
+        }
+    }
 
-//    fun synvToDb() {
-//        val query: BmobQuery<Note> = BmobQuery<Note>()
-//        query.addWhereEqualTo("userObjId", BmobUser.getCurrentUser().getUsername())
-//        query.setLimit(50) //查询本用户的50条笔记
-//        query.findObjects(object : FindListener<Note?>() {
-//            fun done(list: List<Note>, e: BmobException?) {
-//                if (e == null) {
-//                    Logger.d("共查询到：" + list.size)
-//                    for (note in list) {
-//                        val entity: NoteEntity = note.toEntity()
-//                        entity.objId = note.objectId
-//                        CloudNoteApp.getNoteEntityDao().insertOrReplace(entity)
-//                    }
-//                    NotesFromDatabaseObservable.ofDate()
-//                        .subscribe(this@NoteFragment)
-//                } else {
-//                    Logger.d("bmob查询失败：" + e.getMessage().toString() + "," + e.getErrorCode())
-//                }
-//            }
-//        })
-//    }
+    private suspend fun syncToBmob() {
+        //未同步的即本地有而云端无
+        NoteUtils.listNotSync().asFlow()
+            .onEach {
+                //本地有云端无 本地无objId  直接上传
+                if (it.objId.isEmpty()) {
+                    val note = it.toBmob()
+                    val resp = BmobMethods.INSTANCE.postNote(
+                        note.toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
+                            .createJsonRequestBody()
+                    )
+                    val postResp = resp.toBean<PostResp>()
+                    //保存objectId
+                    it.objId = postResp.objectId
+                } else {
+                    //云端同步后 本地不可能出现本地有记录，且存在云端objid，但是没有和云端同步
+                    XLog.d("不太可能出现的一种情况\n$it")
+                }
+                it.isSync = true
+                it.saveOrUpdate()
+            }.flowOn(Dispatchers.IO).onCompletion {
+                //完成时调用与末端流操作符处于同一个协程上下文范围
+                listAllFromDb()
+            }.collect {
+                XLog.d(it)
+            }
+    }
+
+    //列出本地数据
+    private fun listAllFromDb() {
+        lifecycleScope.launch {
+            val dbwork = async(Dispatchers.IO) {
+                NoteUtils.listAll()
+            }
+            val list = dbwork.await()
+            items.clear()
+            items.addAll(list)
+            adapter.notifyDataSetChanged()
+        }
+    }
 }
