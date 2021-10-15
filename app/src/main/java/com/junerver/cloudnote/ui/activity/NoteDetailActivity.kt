@@ -8,12 +8,20 @@ import android.media.ThumbnailUtils
 import android.provider.MediaStore
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
+import com.dslx.digtalclassboard.net.BmobMethods
+import com.edusoa.ideallecturer.fetchNetwork
+import com.edusoa.ideallecturer.toBean
 import com.elvishew.xlog.XLog
 import com.junerver.cloudnote.R
+import com.junerver.cloudnote.bean.DelResp
+import com.junerver.cloudnote.bean.ErrorResp
 import com.junerver.cloudnote.databinding.ActivityNoteDetailBinding
 import com.junerver.cloudnote.databinding.BackBarBinding
 import com.junerver.cloudnote.db.entity.Note
 import com.junerver.cloudnote.db.entity.NoteEntity
+import com.junerver.cloudnote.utils.NetUtils
+import kotlinx.coroutines.launch
 
 /**
  * 用于查看笔记的页面
@@ -79,14 +87,27 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
             builder.setTitle("确认要删除这个笔记么？")
             builder.setPositiveButton("确认"
             ) { _, _ ->
-                val note = Note()
-                note.objectId = mNoteEntity.objId
-                //网络请求删除
-
-                //本地数据库删除
-
-                showShortToast(getString(R.string.del_success))
-                finish()
+                if (NetUtils.isConnected(mContext)) {
+                    lifecycleScope.launch {
+                        //云端删除
+                        fetchNetwork({
+                            BmobMethods.INSTANCE.delNoteById(mNoteEntity.objId)
+                        }, {
+                            val delResp = it.toBean<DelResp>()
+                            //本地删除
+                            mNoteEntity.delete()
+                            showShortToast(getString(R.string.del_success))
+                            finish()
+                        }, { errorBody, errorMsg, code ->
+                            errorBody?.let {
+                                val bean = it.toBean<ErrorResp>()
+                                delInLocalWithoutNetWork()
+                            }
+                        })
+                    }
+                } else {
+                    delInLocalWithoutNetWork()
+                }
             }
             builder.setNegativeButton("取消", null)
             builder.show()
@@ -94,12 +115,18 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
         backBarBinding.ivBack.setOnClickListener { finish() }
     }
 
+    fun delInLocalWithoutNetWork() {
+        mNoteEntity.isLocalDel = true
+        mNoteEntity.saveOrUpdate("objId = ?",mNoteEntity.objId)
+        showShortToast(getString(R.string.del_success))
+        finish()
+    }
 
     //编辑后返回变更
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            mNoteEntity = data?.getParcelableExtra("Note")!!
+            mNoteEntity = data?.getSerializableExtra("Note")!! as NoteEntity
             inflateView(mNoteEntity)
         }
     }

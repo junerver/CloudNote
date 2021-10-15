@@ -1,5 +1,6 @@
 package com.junerver.cloudnote.ui.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -20,6 +21,7 @@ import com.junerver.cloudnote.bean.PostResp
 import com.junerver.cloudnote.bean.PutResp
 import com.junerver.cloudnote.databinding.ActivityEditNoteBinding
 import com.junerver.cloudnote.db.entity.NoteEntity
+import com.junerver.cloudnote.utils.NetUtils
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -132,58 +134,62 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
                 noteEntity.createdTime = TimeUtils.currentTimeSecond()
             }
             noteEntity.updatedTime = TimeUtils.currentTimeSecond()
+            //只要点击了提交按钮都视为变更了内容
             noteEntity.isSync = false
             //序列化传递过来的改实例会丢失isSave的字段，从而导致使用save会直接再创建一个新的对象
             XLog.d("此数据是否已经持久化：${noteEntity.isSaved}")
             noteEntity.saveOrUpdate("objId = ?",noteEntity.objId)
             isNew = false
             mNoteEntity = noteEntity
-            showProgress()
-            launch {
-                if (isNew) {
-                    //新建笔记 post 提交
-                    fetchNetwork({
-                        BmobMethods.INSTANCE.postNote(
-                            noteEntity.toBmob()
-                                .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
-                                .createJsonRequestBody()
-                        )
-                    }, {
-                        closeProgress()
-                        val postResp = it.toBean<PostResp>()
-                        isNew = false
-                        noteEntity.isSync = true
-                        noteEntity.objId = postResp.objectId
-                        noteEntity.save()
-                    }, { errorBody, errorMsg, code ->
-                        closeProgress()
-                        errorBody?.let {
-                            val bean = it.toBean<ErrorResp>()
-                            showLongToast(errorMsg + bean.error)
-                        }
-                    })
-                } else {
-                    //更新
-                    fetchNetwork({
-                        BmobMethods.INSTANCE.putNoteById(
-                            noteEntity.objId,
-                            noteEntity.toBmob()
-                                .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
-                                .createJsonRequestBody()
-                        )
-                    }, {
-                        closeProgress()
-                        val putResp = it.toBean<PutResp>()
-                        noteEntity.isSync = true
-                        XLog.d("此数据是否已经持久化：${noteEntity.isSaved}")
-                        noteEntity.save()
-                    }, { errorBody, errorMsg, code ->
-                        closeProgress()
-                        errorBody?.let {
-                            val bean = it.toBean<ErrorResp>()
-                            showLongToast(errorMsg + bean.error)
-                        }
-                    })
+            done()
+            if (NetUtils.isConnected(mContext)) {
+                showProgress()
+                launch {
+                    if (isNew) {
+                        //新建笔记 post 提交
+                        fetchNetwork({
+                            BmobMethods.INSTANCE.postNote(
+                                noteEntity.toBmob()
+                                    .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
+                                    .createJsonRequestBody()
+                            )
+                        }, {
+                            closeProgress()
+                            val postResp = it.toBean<PostResp>()
+                            isNew = false
+                            noteEntity.isSync = true
+                            noteEntity.objId = postResp.objectId
+                            noteEntity.save()
+                        }, { errorBody, errorMsg, code ->
+                            closeProgress()
+                            errorBody?.let {
+                                val bean = it.toBean<ErrorResp>()
+                                showLongToast(errorMsg + bean.error)
+                            }
+                        })
+                    } else {
+                        //更新
+                        fetchNetwork({
+                            BmobMethods.INSTANCE.putNoteById(
+                                noteEntity.objId,
+                                noteEntity.toBmob()
+                                    .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
+                                    .createJsonRequestBody()
+                            )
+                        }, {
+                            closeProgress()
+                            val putResp = it.toBean<PutResp>()
+                            noteEntity.isSync = true
+                            XLog.d("此数据是否已经持久化：${noteEntity.isSaved}")
+                            noteEntity.save()
+                        }, { errorBody, errorMsg, code ->
+                            closeProgress()
+                            errorBody?.let {
+                                val bean = it.toBean<ErrorResp>()
+                                showLongToast(errorMsg + bean.error)
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -255,6 +261,11 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
         }
     }
 
+    fun done() {
+        val intent = Intent()
+        intent.putExtra("Note", mNoteEntity)
+        setResult(RESULT_OK, intent)
+    }
 
     companion object {
         private const val TAKE_IMAGE = 1
@@ -273,4 +284,5 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
                 return formatter.format(currentTime)
             }
     }
+
 }

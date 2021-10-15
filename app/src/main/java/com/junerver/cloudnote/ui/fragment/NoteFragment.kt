@@ -1,17 +1,20 @@
 package com.junerver.cloudnote.ui.fragment
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.MultiTypeAdapter
 import com.dslx.digtalclassboard.net.BmobMethods
 import com.edusoa.ideallecturer.createJsonRequestBody
+import com.edusoa.ideallecturer.fetchNetwork
 import com.edusoa.ideallecturer.toBean
 import com.edusoa.ideallecturer.toJson
 import com.elvishew.xlog.XLog
@@ -19,12 +22,11 @@ import com.idealworkshops.idealschool.utils.SpUtils
 import com.junerver.cloudnote.Constants
 import com.junerver.cloudnote.R
 import com.junerver.cloudnote.adapter.NoteViewBinder
-import com.junerver.cloudnote.bean.GetAllNoteResp
-import com.junerver.cloudnote.bean.PostResp
-import com.junerver.cloudnote.bean.PutResp
+import com.junerver.cloudnote.bean.*
 import com.junerver.cloudnote.databinding.FragmentNoteBinding
 import com.junerver.cloudnote.db.NoteUtils
 import com.junerver.cloudnote.ui.activity.EditNoteActivity
+import com.junerver.cloudnote.utils.NetUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
@@ -42,6 +44,7 @@ class NoteFragment : BaseFragment() {
     private lateinit var mLayoutManager: LinearLayoutManager
     private val adapter = MultiTypeAdapter()
     private val items = ArrayList<Any>()
+    private lateinit var mContext: Context
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,13 +52,49 @@ class NoteFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentNoteBinding.inflate(inflater, container, false)
+        mContext = requireContext()
         init()
         return binding.root
     }
 
     private fun init() {
+        val binder = NoteViewBinder()
+        binder.setLongClickListener { item ->
+            val builder: AlertDialog.Builder = AlertDialog.Builder(mContext)
+            builder.setTitle("确认要删除这个笔记么？")
+            builder.setPositiveButton(
+                "确认"
+            ) { _, _ ->
 
-        adapter.register(NoteViewBinder())
+                if (NetUtils.isConnected(mContext)) {
+                    lifecycleScope.launch {
+                        //云端删除
+                        fetchNetwork({
+                            BmobMethods.INSTANCE.delNoteById(item.objId)
+                        }, {
+                            val delResp = it.toBean<DelResp>()
+                            //本地删除
+                            item.delete()
+                            listAllFromDb()
+                        }, { errorBody, errorMsg, code ->
+                            errorBody?.let {
+                                val bean = it.toBean<ErrorResp>()
+                                item.isLocalDel = true
+                                item.saveOrUpdate("objId = ?",item.objId)
+                                listAllFromDb()
+                            }
+                        })
+                    }
+                } else {
+                    item.isLocalDel = true
+                    item.saveOrUpdate("objId = ?",item.objId)
+                    listAllFromDb()
+                }
+            }
+            builder.setNegativeButton("取消", null)
+            builder.show()
+        }
+        adapter.register(binder)
         binding.rvList.adapter = adapter
         //设置固定大小
         binding.rvList.setHasFixedSize(true)
@@ -94,14 +133,12 @@ class NoteFragment : BaseFragment() {
                 val map = mapOf("userObjId" to SpUtils.decodeString(Constants.SP_USER_ID))
                 val resp = BmobMethods.INSTANCE.getAllNoteByUserId(map.toJson())
                 emit(resp)
-            }.map {
-                XLog.json(it)
-                val allNote = it.toBean<GetAllNoteResp>()
-                allNote
+            }.catch { e ->
+                XLog.e(e)
             }.flatMapConcat {
-                it.results.asFlow()
+                val allNote = it.toBean<GetAllNoteResp>()
+                allNote.results.asFlow()
             }.onEach { note ->
-                XLog.d(note)
                 //云端的每一条笔记
                 val objId = note.objectId
                 //根据bmob的objid查表
@@ -120,7 +157,7 @@ class NoteFragment : BaseFragment() {
                         if (resp.contains("ok")) {
                             //远端删除成功 本地删除
                             it.delete()
-                            XLog.d("远端删除成功 本地删除")
+                            XLog.d("远端删除成功 本地删除\n$resp")
                         }
                         return@let
                     }
@@ -129,7 +166,7 @@ class NoteFragment : BaseFragment() {
                         note.updatedTime > it.updatedTime -> {
                             //云端内容更新更新本地数据
                             it.update(note)
-                            XLog.d("使用云端数据更新本地数据库")
+                            XLog.d("使用云端数据更新本地数据库\n$it\n$note")
                         }
                         note.updatedTime < it.updatedTime -> {
                             //云端数据小于本地 更新云端
@@ -140,12 +177,11 @@ class NoteFragment : BaseFragment() {
                                     .createJsonRequestBody()
                             )
                             val putResp = resp.toBean<PutResp>()
-                            XLog.d("使用本地数据更新云端数据")
+                            XLog.d("使用本地数据更新云端数据 \n$it\n$note")
                         }
                         else -> {
-                            //数据相同
-                            //do nothing
-                            XLog.d("本地数据与云端数据相同")
+                            //数据相同 do nothing
+                            XLog.d("本地数据与云端数据相同\n$it\n$note")
                             return@let
                         }
                     }

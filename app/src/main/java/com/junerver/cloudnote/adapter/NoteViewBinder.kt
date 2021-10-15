@@ -26,6 +26,11 @@ import com.junerver.cloudnote.utils.NetUtils
  */
 class NoteViewBinder : ItemViewBinder<NoteEntity,NoteViewBinder.ViewHolder>() {
 
+    //长按的点击事件
+    private var longClickListener:((item:NoteEntity)->Unit)? = null
+    fun setLongClickListener(listener:(item:NoteEntity)->Unit) {
+        this.longClickListener = listener
+    }
 
     class ViewHolder(itemView : View): RecyclerView.ViewHolder(itemView) {
         val cardview :CardView = itemView.findViewById(R.id.root)
@@ -42,21 +47,9 @@ class NoteViewBinder : ItemViewBinder<NoteEntity,NoteViewBinder.ViewHolder>() {
             it.context.startActivity(showIntent)
         }
         holder.cardview.setOnLongClickListener { it->
-            val builder: AlertDialog.Builder = AlertDialog.Builder(it.context)
-            builder.setTitle("确认要删除这个笔记么？")
-            builder.setPositiveButton("确认"
-            ) { _, _ ->
-                val note = item
-                if (NetUtils.isConnected(it.context)) {
-                    //存在网络，云删除
-                } else {
-                    //没有网络本地删除加标识
-                    item.isLocalDel = true
-                    item.saveOrUpdate("objId = ?",item.objId)
-                }
+            if (longClickListener != null) {
+                longClickListener?.let { it1 -> it1(item) }
             }
-            builder.setNegativeButton("取消", null)
-            builder.show()
             true
         }
         holder.tvTitle.text = item.title
