@@ -40,11 +40,10 @@ object BmobMethods {
                     .build()
                 chain.proceed(request)
             }
-            .addInterceptor(httpLoggingInterceptor)
+//            .addInterceptor(httpLoggingInterceptor)
         mRetrofit = Retrofit.Builder()
             .client(builder.build())
             .addConverterFactory(ScalarsConverterFactory.create())
-//            .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_URL)
             .build()
         INSTANCE = mRetrofit.create(BmobMethods.WebService::class.java)
@@ -70,7 +69,7 @@ object BmobMethods {
         //上传文件
         @POST("2/files/{fileName}")
         suspend fun postFile(
-            @Header("Content-Type") contentType: String,
+//            @Header("Content-Type") contentType: String,
             @Path("fileName") fileName: String,
             @Body body: RequestBody
         ): String

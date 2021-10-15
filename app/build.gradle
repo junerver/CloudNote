@@ -42,9 +42,12 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.8'
 
     def retrofit2_version = "2.9.0"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit2_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit2_version"
-    implementation 'com.squareup.retrofit2:converter-scalars:2.5.0'
+    implementation("com.squareup.retrofit2:retrofit:$retrofit2_version"){
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+    }
+    implementation("com.squareup.retrofit2:converter-scalars:$retrofit2_version"){
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+    }
 
     implementation'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
 
@@ -61,7 +64,7 @@ dependencies {
     implementation('com.github.ihsanbal:LoggingInterceptor:3.1.0') {
         exclude group: 'org.json', module: 'json'
     }
-
+    implementation("com.squareup.okhttp3:okhttp:4.9.2")
     implementation 'com.elvishew:xlog:1.10.1'
 }
 

@@ -10,8 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.junit.Assert
 import org.junit.Test
+import java.io.File
 
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
@@ -36,7 +38,7 @@ class ExampleUnitTest {
         //测试put编辑
 //        val resp = BmobMethods.INSTANCE.putNoteById(
 //            "2352b66471",
-//            """{"content": "这是一个测试new"}""".createJsonRequestBody()
+            """{"content": "这是一个测试new"}""".createJsonRequestBody()
 //        )
         // {"updatedAt":"2021-10-14 09:35:58"}
 
@@ -61,6 +63,14 @@ class ExampleUnitTest {
         delay(10000)
     }
 
+    @Test
+    fun testFile()=runBlocking {
+        val file = File("/Users/houwenjun/wallhaven-o35e69.jpg")
+        val resp = BmobMethods.INSTANCE.postFile("test.jpg",file.asRequestBody())
+
+        println(resp)
+        delay(10000)
+    }
 
     @Test
     fun testFlow() = runBlocking {

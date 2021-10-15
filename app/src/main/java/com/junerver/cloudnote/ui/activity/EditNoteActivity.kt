@@ -23,6 +23,7 @@ import com.junerver.cloudnote.databinding.ActivityEditNoteBinding
 import com.junerver.cloudnote.db.entity.NoteEntity
 import com.junerver.cloudnote.utils.NetUtils
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -289,4 +290,8 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
             }
     }
 
+   suspend fun file() {
+        val file = File("")
+        val resp = BmobMethods.INSTANCE.postFile("test.jpg",file.asRequestBody())
+    }
 }
