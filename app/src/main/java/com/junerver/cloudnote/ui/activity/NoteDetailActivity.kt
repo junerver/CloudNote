@@ -18,7 +18,7 @@ import com.junerver.cloudnote.bean.DelResp
 import com.junerver.cloudnote.bean.ErrorResp
 import com.junerver.cloudnote.databinding.ActivityNoteDetailBinding
 import com.junerver.cloudnote.databinding.BackBarBinding
-import com.junerver.cloudnote.db.entity.Note
+import com.junerver.cloudnote.db.NoteUtils
 import com.junerver.cloudnote.db.entity.NoteEntity
 import com.junerver.cloudnote.utils.NetUtils
 import kotlinx.coroutines.launch
@@ -28,19 +28,20 @@ import kotlinx.coroutines.launch
  */
 class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
 
-    private lateinit var mNoteEntity: NoteEntity
+    //看起来是个entity，其实不是
+    private lateinit var mNote: NoteEntity
 
     private lateinit var backBarBinding: BackBarBinding
     override fun initData() {
-        mNoteEntity = intent.getSerializableExtra("Note")!! as NoteEntity
-        XLog.d(mNoteEntity)
+        mNote = intent.getSerializableExtra("Note")!! as NoteEntity
+        XLog.d(mNote)
     }
 
     override fun initView() {
         backBarBinding = BackBarBinding.bind(viewBinding.llRoot)
         backBarBinding.ivDone.visibility = View.GONE
         backBarBinding.tvBarTitle.text = "笔记详情"
-        inflateView(mNoteEntity)
+        inflateView(mNote)
     }
 
     private fun inflateView(noteEntity: NoteEntity) {
@@ -79,7 +80,7 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
     override fun setListeners() {
         viewBinding.btnEdit.setOnClickListener {
             val editIntent = Intent(mContext, EditNoteActivity::class.java)
-            editIntent.putExtra("Note", mNoteEntity)
+            editIntent.putExtra("Note", mNote)
             startActivityForResult(editIntent, EDIT_NOTE)
         }
         viewBinding.btnDelete.setOnClickListener{
@@ -91,11 +92,11 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
                     lifecycleScope.launch {
                         //云端删除
                         fetchNetwork({
-                            BmobMethods.INSTANCE.delNoteById(mNoteEntity.objId)
+                            BmobMethods.INSTANCE.delNoteById(mNote.objId)
                         }, {
                             val delResp = it.toBean<DelResp>()
                             //本地删除
-                            mNoteEntity.delete()
+                            NoteUtils.delNoteById(mNote.objId)
                             showShortToast(getString(R.string.del_success))
                             finish()
                         }, { errorBody, errorMsg, code ->
@@ -116,8 +117,8 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
     }
 
     fun delInLocalWithoutNetWork() {
-        mNoteEntity.isLocalDel = true
-        mNoteEntity.saveOrUpdate("objId = ?",mNoteEntity.objId)
+        mNote.isLocalDel = true
+        mNote.saveOrUpdate("objId = ?",mNote.objId)
         showShortToast(getString(R.string.del_success))
         finish()
     }
@@ -126,8 +127,8 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            mNoteEntity = data?.getSerializableExtra("Note")!! as NoteEntity
-            inflateView(mNoteEntity)
+            mNote = data?.getSerializableExtra("Note")!! as NoteEntity
+            inflateView(mNote)
         }
     }
 

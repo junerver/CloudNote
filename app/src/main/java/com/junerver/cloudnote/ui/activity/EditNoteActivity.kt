@@ -37,13 +37,13 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
 
     private var mNoteEntity: NoteEntity? = null
 
-    //是否是新笔记
-    private var isNew = false
+    //是否是新笔记 是新建entity 还是使用旧的entity
+    private var isNew = true
     private var mImageFile: File? = null
     private var mVideoFile: File? = null
     private var mImageUri: Uri? = null
     private var mVideoUri: Uri? = null
-    private val id = 0L //id
+
     override fun initView() {
         viewBinding.backBar.tvBarTitle.text = "新建笔记"
     }
@@ -136,10 +136,9 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
             noteEntity.updatedTime = TimeUtils.currentTimeSecond()
             //只要点击了提交按钮都视为变更了内容
             noteEntity.isSync = false
-            //序列化传递过来的改实例会丢失isSave的字段，从而导致使用save会直接再创建一个新的对象
-            XLog.d("此数据是否已经持久化：${noteEntity.isSaved}")
+            //序列化传递过来的实例会丢失isSave等litepal保留字段，从而导致使用save会直接再创建一个新的对象
             noteEntity.saveOrUpdate("objId = ?",noteEntity.objId)
-            isNew = false
+            //此时实例已经持久化
             mNoteEntity = noteEntity
             done()
             if (NetUtils.isConnected(mContext)) {
@@ -160,6 +159,7 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
                             noteEntity.isSync = true
                             noteEntity.objId = postResp.objectId
                             noteEntity.save()
+                            showShortToast("保存成功！")
                         }, { errorBody, errorMsg, code ->
                             closeProgress()
                             errorBody?.let {
@@ -180,8 +180,8 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
                             closeProgress()
                             val putResp = it.toBean<PutResp>()
                             noteEntity.isSync = true
-                            XLog.d("此数据是否已经持久化：${noteEntity.isSaved}")
                             noteEntity.save()
+                            showShortToast("保存成功！")
                         }, { errorBody, errorMsg, code ->
                             closeProgress()
                             errorBody?.let {
@@ -191,6 +191,10 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
                         })
                     }
                 }
+            } else {
+                //此时保存完成 不是新的实例
+                isNew = false
+                showShortToast("保存成功！")
             }
         }
 

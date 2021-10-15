@@ -37,6 +37,7 @@ class NoteViewBinder : ItemViewBinder<NoteEntity,NoteViewBinder.ViewHolder>() {
         val tvTitle: TextView = itemView.findViewById(R.id.tvTitle)
         val tvDate: TextView = itemView.findViewById(R.id.tvDate)
         val tvSummary: TextView = itemView.findViewById(R.id.tvSummary)
+        val tvCreateTime: TextView = itemView.findViewById(R.id.tvCreateTime)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, item: NoteEntity) {
@@ -46,7 +47,7 @@ class NoteViewBinder : ItemViewBinder<NoteEntity,NoteViewBinder.ViewHolder>() {
             XLog.d("点击事件：\n${item}")
             it.context.startActivity(showIntent)
         }
-        holder.cardview.setOnLongClickListener { it->
+        holder.cardview.setOnLongClickListener {
             if (longClickListener != null) {
                 longClickListener?.let { it1 -> it1(item) }
             }
@@ -55,6 +56,7 @@ class NoteViewBinder : ItemViewBinder<NoteEntity,NoteViewBinder.ViewHolder>() {
         holder.tvTitle.text = item.title
         holder.tvDate.text = (item.updatedTime*1000).formatToTimeString()
         holder.tvSummary.text = item.summary
+        holder.tvCreateTime.text = (item.createdTime*1000).formatToTimeString()
     }
 
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {

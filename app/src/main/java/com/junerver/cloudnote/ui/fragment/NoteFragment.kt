@@ -57,6 +57,12 @@ class NoteFragment : BaseFragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        XLog.d("自动同步一次")
+        syncToDb()
+    }
+
     private fun init() {
         val binder = NoteViewBinder()
         binder.setLongClickListener { item ->
@@ -79,8 +85,13 @@ class NoteFragment : BaseFragment() {
                         }, { errorBody, errorMsg, code ->
                             errorBody?.let {
                                 val bean = it.toBean<ErrorResp>()
-                                item.isLocalDel = true
-                                item.saveOrUpdate("objId = ?",item.objId)
+                                if (code == 101) {
+                                    //云端没有该对象
+                                    item.delete()
+                                } else {
+                                    item.isLocalDel = true
+                                    item.saveOrUpdate("objId = ?",item.objId)
+                                }
                                 listAllFromDb()
                             }
                         })
@@ -186,7 +197,6 @@ class NoteFragment : BaseFragment() {
                         }
                     }
                     it.isSync = true
-                    XLog.d("此数据是否已经持久化：${it.isSaved}")
                     it.save()
                 }
             }.flowOn(Dispatchers.IO).onCompletion {
@@ -244,5 +254,10 @@ class NoteFragment : BaseFragment() {
             items.addAll(list)
             adapter.notifyDataSetChanged()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        listAllFromDb()
     }
 }

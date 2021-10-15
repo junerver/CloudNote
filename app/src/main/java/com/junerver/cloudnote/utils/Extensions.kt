@@ -476,10 +476,10 @@ inline fun String.createJsonRequestBody(): RequestBody =
  * @param onHttpError 出现httperror的回调 会取出code 与 body
  * @return
  */
-suspend inline fun fetchNetwork(
-    crossinline doNetwork: suspend CoroutineScope. () -> String,
-    crossinline onSuccess: (result: String) -> Unit,
-    crossinline onHttpError: (errorBody: String?, errorMsg: String, code: Int?) -> Unit
+suspend fun fetchNetwork(
+    doNetwork: suspend CoroutineScope. () -> String,
+    onSuccess: (result: String) -> Unit,
+    onHttpError: (errorBody: String?, errorMsg: String, code: Int?) -> Unit
 ) {
     try {
         //该函数集成父协程的CoroutineScope

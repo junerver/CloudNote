@@ -28,11 +28,27 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="26dp"
-            android:layout_marginLeft="26dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
             android:layout_marginTop="10dp"
             android:text="今天是个好日子"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/tvCreateTime"
+            android:layout_width="152dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/tvDate"
+            android:layout_marginStart="73dp"
+            android:layout_marginLeft="73dp"
+            android:layout_marginTop="-33dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@+id/tvDate"
+            android:layout_toRightOf="@+id/tvDate"
+            android:gravity="right"
+            android:text="今天是12月31..."
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvDate"
@@ -41,22 +57,28 @@
             android:layout_below="@+id/tvTitle"
             android:layout_alignStart="@+id/tvTitle"
             android:layout_alignLeft="@+id/tvTitle"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="8dp"
             android:text="2015年12月31日 19:30"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/greyblue" />
+            android:textColor="@color/greyblue"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvSummary"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/tvDate"
             android:layout_marginStart="18dp"
             android:layout_marginLeft="18dp"
+            android:layout_marginEnd="10dp"
             android:layout_toEndOf="@+id/tvDate"
             android:layout_toRightOf="@+id/tvDate"
-            android:text="今天是12月31..."
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:maxEms="5"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="今天是12月3asdasdf1..."
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="14sp" />
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

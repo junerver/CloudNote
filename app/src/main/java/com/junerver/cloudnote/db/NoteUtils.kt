@@ -35,4 +35,10 @@ object NoteUtils {
     fun queryNoteById(id: String): NoteEntity? {
         return LitePal.where("objId = '$id'").findFirst()
     }
+
+    fun delNoteById(id: String) {
+        LitePal.where("objId = '$id'").find<NoteEntity>().forEach {
+            it.delete()
+        }
+    }
 }
