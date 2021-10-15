@@ -8,6 +8,7 @@ import android.media.ThumbnailUtils
 import android.provider.MediaStore
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import com.elvishew.xlog.XLog
 import com.junerver.cloudnote.R
 import com.junerver.cloudnote.databinding.ActivityNoteDetailBinding
 import com.junerver.cloudnote.databinding.BackBarBinding
@@ -23,12 +24,14 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
 
     private lateinit var backBarBinding: BackBarBinding
     override fun initData() {
-        mNoteEntity = intent.getParcelableExtra("Note")!!
+        mNoteEntity = intent.getSerializableExtra("Note")!! as NoteEntity
+        XLog.d(mNoteEntity)
     }
 
     override fun initView() {
         backBarBinding = BackBarBinding.bind(viewBinding.llRoot)
         backBarBinding.ivDone.visibility = View.GONE
+        backBarBinding.tvBarTitle.text = "笔记详情"
         inflateView(mNoteEntity)
     }
 
@@ -37,13 +40,13 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
         val content: String = noteEntity.content
         val image: String = noteEntity.image
         val video: String = noteEntity.video
-        if (title != null) {
-            viewBinding.tvNoteTitle.setText(title)
+        if (title.isNotEmpty()) {
+            viewBinding.tvNoteTitle.text = title
         }
-        if (content != null) {
-            viewBinding.tvNoteContent.setText(content)
+        if (content.isNotEmpty()) {
+            viewBinding.tvNoteContent.text = content
         }
-        if (image != null) {
+        if (image.isNotEmpty()) {
             var bitmap: Bitmap = BitmapFactory.decodeFile(image)
             bitmap = ThumbnailUtils.extractThumbnail(
                 bitmap,
@@ -53,7 +56,7 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
             )
             viewBinding.ivImage.setImageBitmap(bitmap)
         }
-        if (video != null) {
+        if (video.isNotEmpty()) {
             var bitmap: Bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND)!!
             bitmap = ThumbnailUtils.extractThumbnail(
                 bitmap,
@@ -88,6 +91,7 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
             builder.setNegativeButton("取消", null)
             builder.show()
         }
+        backBarBinding.ivBack.setOnClickListener { finish() }
     }
 
 

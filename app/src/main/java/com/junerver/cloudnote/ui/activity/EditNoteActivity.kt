@@ -42,9 +42,11 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
     private var mImageUri: Uri? = null
     private var mVideoUri: Uri? = null
     private val id = 0L //id
-    override fun initView() {}
+    override fun initView() {
+        viewBinding.backBar.tvBarTitle.text = "新建笔记"
+    }
     override fun initData() {
-        mNoteEntity = intent.getParcelableExtra("Note")
+        mNoteEntity = intent.getSerializableExtra("Note") as NoteEntity?
         if (mNoteEntity != null) {
             //不为空说明是编辑
             isNew = false
@@ -131,8 +133,9 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
             }
             noteEntity.updatedTime = TimeUtils.currentTimeSecond()
             noteEntity.isSync = false
+            //序列化传递过来的改实例会丢失isSave的字段，从而导致使用save会直接再创建一个新的对象
             XLog.d("此数据是否已经持久化：${noteEntity.isSaved}")
-            noteEntity.save()
+            noteEntity.saveOrUpdate("objId = ?",noteEntity.objId)
             isNew = false
             mNoteEntity = noteEntity
             showProgress()

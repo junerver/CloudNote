@@ -17,6 +17,15 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:id="@+id/ivBack"/>
+        <TextView
+            android:id="@+id/tvBarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="笔记详情"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/tool_bar_text_size"/>
 
         <ImageView
             android:layout_width="@dimen/tool_bar_item_icon_height"

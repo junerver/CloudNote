@@ -6,6 +6,7 @@ import com.idealworkshops.idealschool.utils.SpUtils
 import com.junerver.cloudnote.Constants
 import kotlinx.parcelize.Parcelize
 import org.litepal.crud.LitePalSupport
+import java.io.Serializable
 
 /**
  * Created by junerver on 2016/9/1.
@@ -13,9 +14,7 @@ import org.litepal.crud.LitePalSupport
  * update 16-10-12:增加字段 image video
  */
 // 用于处理 Lint 的错误提示
-@SuppressLint("ParcelCreator")
-@Parcelize
-class NoteEntity : LitePalSupport(), Parcelable {
+class NoteEntity : LitePalSupport(), Serializable {
 
     //标题
     var title: String = ""

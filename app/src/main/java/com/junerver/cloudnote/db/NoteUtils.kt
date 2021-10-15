@@ -13,12 +13,11 @@ import org.litepal.extension.findFirst
  */
 object NoteUtils {
     /**
-     * 列出全部数据
-     *
+     * 列出全部数据 排除本地删除
      * @return
      */
     fun listAll(): List<NoteEntity> {
-        return LitePal.where().order("updatedTime desc").find()
+        return LitePal.where("isLocalDel = false").order("updatedTime desc").find()
     }
 
     /**
