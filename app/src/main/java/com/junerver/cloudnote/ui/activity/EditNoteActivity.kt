@@ -7,12 +7,20 @@ import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.view.View
-import android.widget.ImageView
+import com.dslx.digtalclassboard.net.BmobMethods
+import com.edusoa.ideallecturer.createJsonRequestBody
+import com.edusoa.ideallecturer.fetchNetwork
+import com.edusoa.ideallecturer.toBean
+import com.edusoa.ideallecturer.toJson
 import com.edusoa.ideallecturer.utils.TimeUtils
-import com.junerver.cloudnote.R
+import com.elvishew.xlog.XLog
+import com.junerver.cloudnote.Constants
+import com.junerver.cloudnote.bean.ErrorResp
+import com.junerver.cloudnote.bean.PostResp
+import com.junerver.cloudnote.bean.PutResp
 import com.junerver.cloudnote.databinding.ActivityEditNoteBinding
 import com.junerver.cloudnote.db.entity.NoteEntity
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,6 +34,7 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
 
 
     private var mNoteEntity: NoteEntity? = null
+
     //是否是新笔记
     private var isNew = false
     private var mImageFile: File? = null
@@ -60,7 +69,10 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
                 viewBinding.ibImage.setImageBitmap(bitmap)
             }
             if (video.isNotEmpty()) {
-                var bitmap: Bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND)!!
+                var bitmap: Bitmap = ThumbnailUtils.createVideoThumbnail(
+                    video,
+                    MediaStore.Images.Thumbnails.MICRO_KIND
+                )!!
                 bitmap = ThumbnailUtils.extractThumbnail(
                     bitmap,
                     max(500, viewBinding.ibVideo.width),
@@ -100,7 +112,7 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
             //如果是新建笔记就新建实例，否则使用原来的实例
             val noteEntity: NoteEntity = if (isNew) NoteEntity() else mNoteEntity!!
             val title: String = viewBinding.etNoteTitle.text.toString().trim()
-            val content: String = viewBinding.etNoteContent.getText().toString().trim()
+            val content: String = viewBinding.etNoteContent.text.toString().trim()
             val summary = getSummary(content)
             if (mImageUri != null) {
                 val image = mImageUri!!.path
@@ -113,11 +125,64 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
             noteEntity.title = title
             noteEntity.content = content
             noteEntity.summary = summary
+            //初次创建时赋值id与创建时间
+            if (isNew) {
+                noteEntity.createdTime = TimeUtils.currentTimeSecond()
+            }
             noteEntity.updatedTime = TimeUtils.currentTimeSecond()
-//            NotesSaveToDbAndBmobObservable.save(noteEntity, isNew)
-//                .subscribe(this)
-            //数据同时上传云端与数据库
+            noteEntity.isSync = false
+            XLog.d("此数据是否已经持久化：${noteEntity.isSaved}")
+            noteEntity.save()
+            isNew = false
+            mNoteEntity = noteEntity
             showProgress()
+            launch {
+                if (isNew) {
+                    //新建笔记 post 提交
+                    fetchNetwork({
+                        BmobMethods.INSTANCE.postNote(
+                            noteEntity.toBmob()
+                                .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
+                                .createJsonRequestBody()
+                        )
+                    }, {
+                        closeProgress()
+                        val postResp = it.toBean<PostResp>()
+                        isNew = false
+                        noteEntity.isSync = true
+                        noteEntity.objId = postResp.objectId
+                        noteEntity.save()
+                    }, { errorBody, errorMsg, code ->
+                        closeProgress()
+                        errorBody?.let {
+                            val bean = it.toBean<ErrorResp>()
+                            showLongToast(errorMsg + bean.error)
+                        }
+                    })
+                } else {
+                    //更新
+                    fetchNetwork({
+                        BmobMethods.INSTANCE.putNoteById(
+                            noteEntity.objId,
+                            noteEntity.toBmob()
+                                .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
+                                .createJsonRequestBody()
+                        )
+                    }, {
+                        closeProgress()
+                        val putResp = it.toBean<PutResp>()
+                        noteEntity.isSync = true
+                        XLog.d("此数据是否已经持久化：${noteEntity.isSaved}")
+                        noteEntity.save()
+                    }, { errorBody, errorMsg, code ->
+                        closeProgress()
+                        errorBody?.let {
+                            val bean = it.toBean<ErrorResp>()
+                            showLongToast(errorMsg + bean.error)
+                        }
+                    })
+                }
+            }
         }
 
     }
@@ -187,18 +252,6 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
         }
     }
 
-//    fun onCompleted() {
-//        closeProgress()
-//        showShortToast(getString(R.string.save_success))
-//        finish()
-//    }
-//
-//    fun onError(throwable: Throwable?) {}
-//    fun onNext(noteEntity: NoteEntity?) {
-//        val intent = Intent()
-//        intent.putExtra("Note", noteEntity)
-//        setResult(Activity.RESULT_OK, intent)
-//    }
 
     companion object {
         private const val TAKE_IMAGE = 1

@@ -27,13 +27,13 @@ object NoteUtils {
      * @return
      */
     fun listNotSync(): List<NoteEntity> {
-        return LitePal.where("isSync = 'false'")
+        return LitePal.where("isSync = false")
             .find()
 
     }
 
     //根据id从数据库查找
-    fun queryNoteById(id: Long): NoteEntity? {
-        return LitePal.where("id = '$id'").findFirst()
+    fun queryNoteById(id: String): NoteEntity? {
+        return LitePal.where("objId = '$id'").findFirst()
     }
 }

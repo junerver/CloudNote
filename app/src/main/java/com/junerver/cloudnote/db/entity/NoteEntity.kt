@@ -2,11 +2,9 @@ package com.junerver.cloudnote.db.entity
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
-import com.edusoa.ideallecturer.utils.TimeUtils.convertToTimestamp
 import com.idealworkshops.idealschool.utils.SpUtils
 import com.junerver.cloudnote.Constants
 import kotlinx.parcelize.Parcelize
-import org.litepal.annotation.Column
 import org.litepal.crud.LitePalSupport
 
 /**
@@ -18,8 +16,6 @@ import org.litepal.crud.LitePalSupport
 @SuppressLint("ParcelCreator")
 @Parcelize
 class NoteEntity : LitePalSupport(), Parcelable {
-    //本地数据库id 计划采用unix时间戳代替
-    var id: Long = 0
 
     //标题
     var title: String = ""
@@ -45,17 +41,19 @@ class NoteEntity : LitePalSupport(), Parcelable {
     //是否本地删除，当删除时本地云端需要一同删除，如果云端没有删除成功，本地修改字段
     var isLocalDel = false
 
+    //是否云端删除 出现本地记录但是云端无的情况，将本地记录特殊标记
+    var isCloudDel = false
+
     //幕后字段用于对比更新
     var updatedTime: Long = -1L
 
 
-    var createdTime: Long = -1L
+    var createdTime: Long = -1
 
     fun update(note: Note): NoteEntity {
         this.title = note.title
         this.content = note.content
         this.summary = note.summary
-        this.id = note.dbId
         this.updatedTime = note.updatedTime
         this.createdTime = note.createdTime
         this.image = note.image
@@ -67,7 +65,6 @@ class NoteEntity : LitePalSupport(), Parcelable {
     fun toBmob(): Note {
         val note = Note()
         note.content = this.content
-        note.dbId = this.id
         note.title = this.title
         note.summary = this.summary
         note.image = this.image
@@ -79,7 +76,7 @@ class NoteEntity : LitePalSupport(), Parcelable {
     }
 
     override fun toString(): String {
-        return "NoteEntity(id=$id, title='$title', summary='$summary', content='$content', image='$image', video='$video', objId='$objId', isSync=$isSync, isLocalDel=$isLocalDel, updatedTime=$updatedTime, createdTime=$createdTime)"
+        return "NoteEntity(title='$title', summary='$summary', content='$content', image='$image', video='$video', objId='$objId', isSync=$isSync, isLocalDel=$isLocalDel, updatedTime=$updatedTime, createdTime=$createdTime)"
     }
 
 

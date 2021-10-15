@@ -92,25 +92,25 @@ class NoteFragment : BaseFragment() {
             //sync to db
             flow {
                 val map = mapOf("userObjId" to SpUtils.decodeString(Constants.SP_USER_ID))
-                println(map)
                 val resp = BmobMethods.INSTANCE.getAllNoteByUserId(map.toJson())
                 emit(resp)
             }.map {
-                println()
-                println("${Thread.currentThread().name}: $it")
+                XLog.json(it)
                 val allNote = it.toBean<GetAllNoteResp>()
                 allNote
             }.flatMapConcat {
                 it.results.asFlow()
             }.onEach { note ->
+                XLog.d(note)
                 //云端的每一条笔记
                 val objId = note.objectId
-                val dbId = note.dbId
-                val dbBean = NoteUtils.queryNoteById(dbId)
+                //根据bmob的objid查表
+                val dbBean = NoteUtils.queryNoteById(objId)
                 if (dbBean == null) {
                     //本地没有次数据 新建本地数据并保存数据库
                     val entity = note.toEntity()
                     entity.save()
+                    XLog.d("本地没有该数据 新建\n$entity")
                 }
                 //存在本地对象 对比是否跟新 or 删除
                 dbBean?.let {
@@ -120,6 +120,7 @@ class NoteFragment : BaseFragment() {
                         if (resp.contains("ok")) {
                             //远端删除成功 本地删除
                             it.delete()
+                            XLog.d("远端删除成功 本地删除")
                         }
                         return@let
                     }
@@ -128,6 +129,7 @@ class NoteFragment : BaseFragment() {
                         note.updatedTime > it.updatedTime -> {
                             //云端内容更新更新本地数据
                             it.update(note)
+                            XLog.d("使用云端数据更新本地数据库")
                         }
                         note.updatedTime < it.updatedTime -> {
                             //云端数据小于本地 更新云端
@@ -138,31 +140,36 @@ class NoteFragment : BaseFragment() {
                                     .createJsonRequestBody()
                             )
                             val putResp = resp.toBean<PutResp>()
+                            XLog.d("使用本地数据更新云端数据")
                         }
                         else -> {
                             //数据相同
                             //do nothing
+                            XLog.d("本地数据与云端数据相同")
+                            return@let
                         }
                     }
                     it.isSync = true
-                    it.saveOrUpdate()
+                    XLog.d("此数据是否已经持久化：${it.isSaved}")
+                    it.save()
                 }
             }.flowOn(Dispatchers.IO).onCompletion {
                 //完成时调用与末端流操作符处于同一个协程上下文范围
+                XLog.d("Bmob☁️同步执行完毕，开始同步本地数据到云端")
                 syncToBmob()
             }.collect {
-                println()
-                println("${Thread.currentThread().name}: $it")
             }
         }
     }
 
+    //同步本地其他数据到云端
     private suspend fun syncToBmob() {
         //未同步的即本地有而云端无
         NoteUtils.listNotSync().asFlow()
             .onEach {
-                //本地有云端无 本地无objId  直接上传
+                XLog.d(it)
                 if (it.objId.isEmpty()) {
+                    //本地有云端无 本地无objId  直接上传
                     val note = it.toBmob()
                     val resp = BmobMethods.INSTANCE.postNote(
                         note.toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
@@ -171,12 +178,17 @@ class NoteFragment : BaseFragment() {
                     val postResp = resp.toBean<PostResp>()
                     //保存objectId
                     it.objId = postResp.objectId
+                    XLog.d("本地有云端无 新建数据")
                 } else {
                     //云端同步后 本地不可能出现本地有记录，且存在云端objid，但是没有和云端同步
+                    // 这种情况只可能是云端手动删除了记录，但是本地没有同步，
+                    // 即一个账号登录了两个客户端，但是在一个客户端中对该记录进行了删除，在另一个客户端中还存在本地记录
+                    //此情况可以加入特殊标记 isCloudDel
+                    it.isCloudDel = true
                     XLog.d("不太可能出现的一种情况\n$it")
                 }
                 it.isSync = true
-                it.saveOrUpdate()
+                it.save()
             }.flowOn(Dispatchers.IO).onCompletion {
                 //完成时调用与末端流操作符处于同一个协程上下文范围
                 listAllFromDb()

@@ -37,7 +37,7 @@ class NoteViewBinder : ItemViewBinder<NoteEntity,NoteViewBinder.ViewHolder>() {
             it.context.startActivity(showIntent)
         }
         holder.tvTitle.text = item.title
-        holder.tvDate.text = item.updatedTime.formatToTimeString()
+        holder.tvDate.text = (item.updatedTime*1000).formatToTimeString()
         holder.tvSummary.text = item.summary
     }
 
