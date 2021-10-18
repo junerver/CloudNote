@@ -1,13 +1,11 @@
 package com.junerver.cloudnote
 
-import com.dslx.digtalclassboard.net.BmobMethods
+import com.junerver.cloudnote.net.BmobMethods
 import com.edusoa.ideallecturer.createJsonRequestBody
 import com.edusoa.ideallecturer.toBase64
 import com.edusoa.ideallecturer.toBean
 import com.edusoa.ideallecturer.toJson
 import com.junerver.cloudnote.bean.GetAllNoteResp
-import com.junerver.cloudnote.db.entity.Note
-import com.junerver.cloudnote.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*

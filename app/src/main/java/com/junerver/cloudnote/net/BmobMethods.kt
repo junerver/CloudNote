@@ -1,4 +1,4 @@
-package com.dslx.digtalclassboard.net
+package com.junerver.cloudnote.net
 
 
 import com.ihsanbal.logging.Level
@@ -46,7 +46,7 @@ object BmobMethods {
             .addConverterFactory(ScalarsConverterFactory.create())
             .baseUrl(BASE_URL)
             .build()
-        INSTANCE = mRetrofit.create(BmobMethods.WebService::class.java)
+        INSTANCE = mRetrofit.create(WebService::class.java)
     }
 
 

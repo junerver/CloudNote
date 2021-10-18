@@ -3,7 +3,7 @@
 
 > 这是一个模仿云笔记的项目，使用Bmob云后端提供诸如注册、登录、数据保存等服务，项目中联系使用了RxJava来处理异步任务，Logger作为调试日志工具，ORM框架使用GreenDAO。
 
-# 重要更新
+# 重要更新 2021/10/18
 1. 迁移到AndroidX
 2. 移除 ButterKnife、GreenDao 等老旧依赖库，改为使用 ViewBingding、LitePal
 3. Bmob 云 SDK 移除，全部改用 RestFul API，这样更具备实践性
@@ -11,7 +11,11 @@
 5. Kotlin First
  
 # 注意
-2018/12/17 关于在 Android 8.0 出现异常的问题是因为本项目有做动态权限与8.0适配！
+2021/10/18 关于为什么安装包体积会变得这么大：
+    1. MMKV的全部so+Umeng全部so接近 2M
+    2. androidX 体积也很大
+
+2018/12/17 关于在 Android 8.0 出现异常的问题是因为本项目没有做动态权限与8.0适配！
 
 2016/10/29 重新申请了Bmob云后台。
 

@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.drakeet.multitype.MultiTypeAdapter
-import com.dslx.digtalclassboard.net.BmobMethods
+import com.junerver.cloudnote.net.BmobMethods
 import com.edusoa.ideallecturer.createJsonRequestBody
 import com.edusoa.ideallecturer.fetchNetwork
 import com.edusoa.ideallecturer.toBean

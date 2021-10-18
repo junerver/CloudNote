@@ -5,9 +5,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.ThumbnailUtils
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
-import com.dslx.digtalclassboard.net.BmobMethods
+import com.junerver.cloudnote.net.BmobMethods
 import com.edusoa.ideallecturer.*
 import com.edusoa.ideallecturer.utils.TimeUtils
 import com.elvishew.xlog.XLog

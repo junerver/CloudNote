@@ -2,7 +2,7 @@ package com.junerver.cloudnote.ui.activity
 
 import android.content.Intent
 import android.text.TextUtils
-import com.dslx.digtalclassboard.net.BmobMethods
+import com.junerver.cloudnote.net.BmobMethods
 import com.edusoa.ideallecturer.fetchNetwork
 import com.edusoa.ideallecturer.toBean
 import com.edusoa.ideallecturer.toJson

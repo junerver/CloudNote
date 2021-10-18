@@ -5,24 +5,11 @@ import android.content.Context
 import com.elvishew.xlog.LogLevel
 import com.elvishew.xlog.XLog
 import com.tencent.mmkv.MMKV
-import com.elvishew.xlog.printer.file.clean.FileLastModifiedCleanStrategy
-
-import com.elvishew.xlog.printer.file.backup.NeverBackupStrategy
-
-import com.elvishew.xlog.printer.file.naming.DateFileNameGenerator
-
-import com.elvishew.xlog.printer.file.FilePrinter
-
-import com.elvishew.xlog.printer.ConsolePrinter
-
-import com.elvishew.xlog.printer.AndroidPrinter
-
-import com.elvishew.xlog.interceptor.BlacklistTagsFilterInterceptor
-
 import com.elvishew.xlog.LogConfiguration
-import com.elvishew.xlog.printer.Printer
+import com.umeng.analytics.MobclickAgent
+import com.umeng.commonsdk.UMConfigure
 import org.litepal.LitePal
-
+import androidx.multidex.MultiDex
 
 class CloudNoteApp : Application() {
 
@@ -32,7 +19,15 @@ class CloudNoteApp : Application() {
         MMKV.initialize(this)
         XLog.init(LogLevel.ALL)
         initXlog()
-
+        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
+        UMConfigure.init(
+            this,
+            "616d093614e22b6a4f25b1b4",
+            "default",
+            UMConfigure.DEVICE_TYPE_PHONE,
+            null
+        )
+        MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.AUTO)
     }
 
     private fun initXlog() {
@@ -46,11 +41,14 @@ class CloudNoteApp : Application() {
             .enableBorder() // 允许打印日志边框，默认禁止
             .build()
 
-
-
-
-        XLog.init( // 初始化 XLog
+        XLog.init(
+            // 初始化 XLog
             config,  // 指定日志配置，如果不指定，会默认使用 new LogConfiguration.Builder().build()
         )
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(newBase)
+        MultiDex.install(this)
     }
 }
