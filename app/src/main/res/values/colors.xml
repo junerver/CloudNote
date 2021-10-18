@@ -20,4 +20,5 @@
     <color name="popup_main_background">#b0000000</color>
     <color name="orange">#FF9900</color>
     <color name="greyblue">#398DEE</color>
+    <color name="red">#F44336</color>
 </resources>

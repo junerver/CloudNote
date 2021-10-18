@@ -49,7 +49,9 @@
                     android:id="@+id/etNoteContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="top"
                     android:autoLink="all"
+                    android:lines="10"
                     android:background="@null"
                     android:hint="@string/note_content_hint"
                     android:minWidth="300dp"
@@ -58,7 +60,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
-                    android:layout_marginTop="100dp">
+                    android:layout_marginTop="10dp">
 
                     <ImageButton
                         android:id="@+id/ibImage"

@@ -1,9 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-              android:orientation="vertical"
-             tools:context="com.junerver.cloudnote.ui.fragment.ConfigFragment">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.junerver.cloudnote.ui.fragment.ConfigFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -14,141 +14,187 @@
             android:id="@+id/ivUserAvatar"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_account_circle_white_48dp"
-            android:background="@null"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="27dp"/>
-        <Button
-            android:id="@+id/btnInOut"
+            android:layout_marginTop="27dp"
+            android:background="@null"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_account_circle_white_48dp" />
+
+        <TextView
+            android:id="@+id/tv_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/login_text"
-            android:textColor="@color/white"
-            android:textSize="@dimen/setting_text_size"
-            android:textAllCaps="false"
-            android:background="@null"
             android:layout_below="@+id/ivUserAvatar"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:background="@null"
+            android:text="@string/login_text"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/setting_text_size" />
     </RelativeLayout>
-    <ImageView
+
+    <View
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:src="@color/gray"/>
-    <ScrollView
+        android:background="@color/gray" />
+
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/setting_list_item_height"
-                android:orientation="horizontal"
-                android:background="#ffffff"
-                android:paddingLeft="@dimen/setting_list_item_padding_vertical"
-                android:paddingRight="@dimen/setting_list_item_padding_vertical"
-                android:paddingTop="@dimen/setting_list_item_padding_horizontal"
-                android:paddingBottom="@dimen/setting_list_item_padding_horizontal">
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_font"/>
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="6"
-                    android:layout_marginLeft="@dimen/setting_list_item_margin"
-                    android:layout_marginStart="@dimen/setting_list_item_margin"
-                    android:text="@string/setting_text_font"
-                    android:textSize="@dimen/setting_list_item_text"
-                    android:gravity="center_vertical|start"/>
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_right_icon"/>
+        android:layout_height="@dimen/setting_list_item_height"
+        android:background="#ffffff"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/setting_list_item_padding_vertical"
+        android:paddingTop="@dimen/setting_list_item_padding_horizontal"
+        android:paddingRight="@dimen/setting_list_item_padding_vertical"
+        android:paddingBottom="@dimen/setting_list_item_padding_horizontal">
 
-            </LinearLayout>
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:src="@color/gray"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/setting_list_item_height"
-                android:orientation="horizontal"
-                android:background="#ffffff"
-                android:paddingLeft="@dimen/setting_list_item_padding_vertical"
-                android:paddingRight="@dimen/setting_list_item_padding_vertical"
-                android:paddingTop="@dimen/setting_list_item_padding_horizontal"
-                android:paddingBottom="@dimen/setting_list_item_padding_horizontal">
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_message"/>
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="6"
-                    android:layout_marginLeft="@dimen/setting_list_item_margin"
-                    android:layout_marginStart="@dimen/setting_list_item_margin"
-                    android:text="@string/setting_text_message"
-                    android:textSize="@dimen/setting_list_item_text"
-                    android:gravity="center_vertical|start"/>
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_right_icon"/>
-            </LinearLayout>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_font" />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:src="@color/gray"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/setting_list_item_margin"
+            android:layout_marginLeft="@dimen/setting_list_item_margin"
+            android:layout_weight="6"
+            android:gravity="center_vertical|start"
+            android:text="@string/setting_text_font"
+            android:textSize="@dimen/setting_list_item_text" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/setting_list_item_height"
-                android:orientation="horizontal"
-                android:background="#ffffff"
-                android:paddingLeft="@dimen/setting_list_item_padding_vertical"
-                android:paddingRight="@dimen/setting_list_item_padding_vertical"
-                android:paddingTop="@dimen/setting_list_item_padding_horizontal"
-                android:paddingBottom="@dimen/setting_list_item_padding_horizontal">
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_about"/>
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="6"
-                    android:layout_marginLeft="@dimen/setting_list_item_margin"
-                    android:layout_marginStart="@dimen/setting_list_item_margin"
-                    android:text="@string/setting_text_about"
-                    android:textSize="@dimen/setting_list_item_text"
-                    android:gravity="center_vertical|start"/>
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_right_icon"/>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_right_icon" />
 
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/setting_list_item_height"
+        android:background="#ffffff"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/setting_list_item_padding_vertical"
+        android:paddingTop="@dimen/setting_list_item_padding_horizontal"
+        android:paddingRight="@dimen/setting_list_item_padding_vertical"
+        android:paddingBottom="@dimen/setting_list_item_padding_horizontal">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_message" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/setting_list_item_margin"
+            android:layout_marginLeft="@dimen/setting_list_item_margin"
+            android:layout_weight="6"
+            android:gravity="center_vertical|start"
+            android:text="@string/setting_text_message"
+            android:textSize="@dimen/setting_list_item_text" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_right_icon" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/setting_list_item_height"
+        android:background="#ffffff"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/setting_list_item_padding_vertical"
+        android:paddingTop="@dimen/setting_list_item_padding_horizontal"
+        android:paddingRight="@dimen/setting_list_item_padding_vertical"
+        android:paddingBottom="@dimen/setting_list_item_padding_horizontal">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_about" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/setting_list_item_margin"
+            android:layout_marginLeft="@dimen/setting_list_item_margin"
+            android:layout_weight="6"
+            android:gravity="center_vertical|start"
+            android:text="@string/setting_text_about"
+            android:textSize="@dimen/setting_list_item_text" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_right_icon" />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray" />
+
+    <LinearLayout
+        android:id="@+id/btn_logout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/setting_list_item_height"
+        android:background="#ffffff"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/setting_list_item_padding_vertical"
+        android:paddingTop="@dimen/setting_list_item_padding_horizontal"
+        android:paddingRight="@dimen/setting_list_item_padding_vertical"
+        android:paddingBottom="@dimen/setting_list_item_padding_horizontal">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_exit" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/setting_list_item_margin"
+            android:layout_marginLeft="@dimen/setting_list_item_margin"
+            android:layout_weight="6"
+            android:gravity="center_vertical|start"
+            android:text="@string/setting_text_exit"
+            android:textColor="@color/red"
+            android:textSize="@dimen/setting_list_item_text" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_right_icon" />
+    </LinearLayout>
 
 </LinearLayout>
