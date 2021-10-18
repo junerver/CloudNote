@@ -20,6 +20,7 @@ class Note {
 
     //图片路径
     var image: String = ""
+    var imgFile: String = ""
 
     //视频路径
     var video: String = ""

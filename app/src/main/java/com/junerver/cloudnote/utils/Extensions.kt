@@ -3,30 +3,34 @@ package com.edusoa.ideallecturer
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.ParseException
 import android.net.Uri
 import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.Transformation
+import com.bumptech.glide.request.RequestOptions
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -166,7 +170,7 @@ fun Context.getUriForFile(file: File): Uri {
     return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
         FileProvider.getUriForFile(
             this.applicationContext,
-            "${this.packageName}.fileprovider",
+            "${this.packageName}.FileProvider",
             file
         )
     } else {
@@ -359,6 +363,45 @@ fun TextView.stringTrim(): String {
     return this.text.toString().trim()
 }
 
+/**
+ * @Description IV图片加载的扩展方法
+ * @Author Junerver
+ * Created at 2018/12/21 16:21
+ * @param url 加载图片地址
+ * @param resourceId 占位图
+ * @param isCircle 是否剪裁为圆形
+ * @param width override尺寸
+ * @param height override尺寸
+ * @param transformation
+ * @return
+ */
+fun ImageView.load(url: Any, @DrawableRes resourceId: Int? = null, isCircle: Boolean = false, width :Int = -1, height:Int = -1, vararg transformation: Transformation<Bitmap>) {
+    val option = RequestOptions()
+    option.apply {
+        if (transformation.isNotEmpty()) {
+            transforms(*transformation)
+        }
+        resourceId?.let {
+            placeholder(it)
+            error(it)
+        }
+        dontAnimate()
+        if (isCircle) {
+            circleCrop()
+        }
+        if (width!=-1 && height!=-1) {
+            override(width,height)
+        }
+//                skipMemoryCache(true)
+//                diskCacheStrategy(DiskCacheStrategy.NONE)
+    }
+
+    Glide.with(context)
+        .load(url)
+        .apply(option)
+        .into(this)
+
+}
 
 /* String 扩展 */
 /**
@@ -532,3 +575,5 @@ fun String.urlEncode(): String {
     val encode:String = URLEncoder.encode(this, "utf-8")
     return encode.replace("%3A", ":").replace("%2F", "/")
 }
+
+fun ByteArray.toBase64(): String = Base64.encodeToString(this, Base64.NO_WRAP)

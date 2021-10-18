@@ -16,8 +16,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <!-- 允许读取手机状态 用于创建BmobInstallation -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <!--拍摄照片后写文件-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!--读取拍摄照片后文件-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <!--
        configChanges参数的作用是不让activity重启
@@ -53,6 +53,16 @@
         </activity>
         <activity android:name=".ui.activity.EditNoteActivity">
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/paths" />
+        </provider>
     </application>
 
 </manifest>

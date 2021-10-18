@@ -48,23 +48,35 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-scalars:$retrofit2_version"){
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     }
+    implementation('com.github.ihsanbal:LoggingInterceptor:3.1.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+    //手动依赖 okhttp 因为 loggingInterceptor 与 retofit都各自依赖了一个版本的okhtp
+    implementation("com.squareup.okhttp3:okhttp:4.9.2")
 
+    //kotlin 协程
     implementation'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
-
     implementation'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
 
+    //腾讯mmkv 高性能kv库代替sp https://github.com/Tencent/MMKV
     implementation 'com.tencent:mmkv-static:1.2.10'
 
+    //数据库ORM https://github.com/guolindev/LitePal
     implementation 'org.litepal.guolindev:core:3.2.3'
+    //动态权限 https://github.com/guolindev/PermissionX
+    implementation 'com.guolindev.permissionx:permissionx:1.6.0'
 
+    //超好用的rv库 用来代替adapter
     implementation 'com.drakeet.multitype:multitype:4.3.0'
 
-    implementation('com.github.ihsanbal:LoggingInterceptor:3.1.0') {
-        exclude group: 'org.json', module: 'json'
-    }
-    implementation("com.squareup.okhttp3:okhttp:4.9.2")
+    //图片加载库 https://github.com/bumptech/glide
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
     implementation 'com.elvishew:xlog:1.10.1'
+
+
 }
 

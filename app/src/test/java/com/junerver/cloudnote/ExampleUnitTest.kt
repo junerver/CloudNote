@@ -2,10 +2,12 @@ package com.junerver.cloudnote
 
 import com.dslx.digtalclassboard.net.BmobMethods
 import com.edusoa.ideallecturer.createJsonRequestBody
+import com.edusoa.ideallecturer.toBase64
 import com.edusoa.ideallecturer.toBean
 import com.edusoa.ideallecturer.toJson
 import com.junerver.cloudnote.bean.GetAllNoteResp
 import com.junerver.cloudnote.db.entity.Note
+import com.junerver.cloudnote.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -36,18 +38,22 @@ class ExampleUnitTest {
         //{"content":"这是一个测试","createdAt":"2020-12-28 20:36:41","dbId":1609159001601,"image":"/storage/emulated/0/1609158993902.png","objectId":"2352b66471","summary":"","title":"122212","updatedAt":"2021-10-14 09:35:58","userObjId":"12","video":"/storage/emulated/0/1609158191429.mp4"}
 
         //测试put编辑
-//        val resp = BmobMethods.INSTANCE.putNoteById(
-//            "2352b66471",
-            """{"content": "这是一个测试new"}""".createJsonRequestBody()
-//        )
+        val file = File("/Users/houwenjun/wallhaven-o35e69.jpg")
+        val bitmap = file.readBytes().toBase64()
+        println("文件转base64长度："+bitmap.length)
+        val resp = BmobMethods.INSTANCE.putNoteById(
+            "99b1410b0c",
+            """{"imgFile": "${bitmap}"}""".createJsonRequestBody()
+        )
+
         // {"updatedAt":"2021-10-14 09:35:58"}
 
         //测试新建
-        val note = Note()
-        note.content = "这是一个测试创建"
-        note.createdAt= "2020-10-11 09:45:34"
-        println(note.toJson(excludeFields = listOf( "_updatedTime", "_createdTime")))
-        val resp = BmobMethods.INSTANCE.postNote(note.toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS).createJsonRequestBody())
+//        val note = Note()
+//        note.content = "这是一个测试创建"
+//        note.createdAt= "2020-10-11 09:45:34"
+//        println(note.toJson(excludeFields = listOf( "_updatedTime", "_createdTime")))
+//        val resp = BmobMethods.INSTANCE.postNote(note.toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS).createJsonRequestBody())
         //{"createdAt":"2021-10-14 09:46:25","objectId":"3bc606fc83"}
 
         //测试删除

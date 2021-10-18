@@ -1,6 +1,5 @@
 package com.junerver.cloudnote.ui.activity
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -9,10 +8,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import com.dslx.digtalclassboard.net.BmobMethods
-import com.edusoa.ideallecturer.createJsonRequestBody
-import com.edusoa.ideallecturer.fetchNetwork
-import com.edusoa.ideallecturer.toBean
-import com.edusoa.ideallecturer.toJson
+import com.edusoa.ideallecturer.*
 import com.edusoa.ideallecturer.utils.TimeUtils
 import com.elvishew.xlog.XLog
 import com.junerver.cloudnote.Constants
@@ -48,6 +44,7 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
     override fun initView() {
         viewBinding.backBar.tvBarTitle.text = "新建笔记"
     }
+
     override fun initData() {
         mNoteEntity = intent.getSerializableExtra("Note") as NoteEntity?
         if (mNoteEntity != null) {
@@ -138,7 +135,7 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
             //只要点击了提交按钮都视为变更了内容
             noteEntity.isSync = false
             //序列化传递过来的实例会丢失isSave等litepal保留字段，从而导致使用save会直接再创建一个新的对象
-            noteEntity.saveOrUpdate("objId = ?",noteEntity.objId)
+            noteEntity.saveOrUpdate("objId = ?", noteEntity.objId)
             //此时实例已经持久化
             mNoteEntity = noteEntity
             done()
@@ -165,6 +162,7 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
                             closeProgress()
                             errorBody?.let {
                                 val bean = it.toBean<ErrorResp>()
+                                XLog.d(errorMsg + bean.error)
                                 showLongToast(errorMsg + bean.error)
                             }
                         })
@@ -220,17 +218,21 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
 
     //插入图片
     private fun insertImage() {
-        mImageFile = File(Environment.getExternalStorageDirectory(), "$time.png")
-        mImageUri = Uri.fromFile(mImageFile)
+        mImageFile = File(getExternalFilesDir(null), "$time.png")
+        mImageUri = getUriForFile(mImageFile!!)
+        XLog.d(mImageFile)
+        XLog.d(mImageUri)
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.putExtra(MediaStore.Images.Media.ORIENTATION, 0)
+        intent.action = MediaStore.ACTION_IMAGE_CAPTURE
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri)
         startActivityForResult(intent, TAKE_IMAGE)
     }
 
     //插入视频
     private fun insertVideo() {
-        mVideoFile = File(Environment.getExternalStorageDirectory(), "$time.mp4")
-        mVideoUri = Uri.fromFile(mVideoFile)
+        mVideoFile = File(getExternalFilesDir(null), "$time.mp4")
+        mVideoUri = getUriForFile(mVideoFile!!)
         val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mVideoUri)
         startActivityForResult(intent, TAKE_VIDEO)
@@ -238,32 +240,39 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == TAKE_IMAGE) {
-            val options: BitmapFactory.Options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeFile(mImageUri!!.path, options)
-            var scale: Int = Math.min(
-                options.outWidth / viewBinding.ibImage.getWidth(),
-                options.outHeight / viewBinding.ibImage.getHeight()
-            )
-            scale = if (scale == 0) 1 else scale
-            options.inJustDecodeBounds = false
-            options.inSampleSize = scale
-            val bitmap: Bitmap = BitmapFactory.decodeFile(mImageUri!!.path, options)
-            viewBinding.ibImage.setImageBitmap(bitmap)
-        } else if (requestCode == TAKE_VIDEO) {
-            var bitmap: Bitmap = ThumbnailUtils.createVideoThumbnail(
-                mVideoUri!!.path!!,
-                MediaStore.Images.Thumbnails.MICRO_KIND
-            )!!
-            bitmap = ThumbnailUtils.extractThumbnail(
-                bitmap,
-                viewBinding.ibVideo.getWidth(),
-                viewBinding.ibVideo.getHeight(),
-                ThumbnailUtils.OPTIONS_RECYCLE_INPUT
-            )
-            viewBinding.ibVideo.setImageBitmap(bitmap)
+        if (resultCode == RESULT_OK) {
+            if (requestCode == TAKE_IMAGE) {
+                XLog.d(data)
+//            val options: BitmapFactory.Options = BitmapFactory.Options()
+//            options.inJustDecodeBounds = true
+//            BitmapFactory.decodeFile(mImageUri!!.path, options)
+//            var scale: Int = Math.min(
+//                options.outWidth / viewBinding.ibImage.getWidth(),
+//                options.outHeight / viewBinding.ibImage.getHeight()
+//            )
+//            scale = if (scale == 0) 1 else scale
+//            options.inJustDecodeBounds = false
+//            options.inSampleSize = scale
+//            val bitmap: Bitmap = BitmapFactory.decodeFile(mImageUri!!.path, options)
+//            viewBinding.ibImage.setImageBitmap(bitmap)
+
+                mImageFile?.let { viewBinding.ibImage.load(it) }
+                XLog.d(mImageFile?.absolutePath)
+            } else if (requestCode == TAKE_VIDEO) {
+                var bitmap: Bitmap = ThumbnailUtils.createVideoThumbnail(
+                    mVideoUri!!.path!!,
+                    MediaStore.Images.Thumbnails.MICRO_KIND
+                )!!
+                bitmap = ThumbnailUtils.extractThumbnail(
+                    bitmap,
+                    viewBinding.ibVideo.getWidth(),
+                    viewBinding.ibVideo.getHeight(),
+                    ThumbnailUtils.OPTIONS_RECYCLE_INPUT
+                )
+                viewBinding.ibVideo.setImageBitmap(bitmap)
+            }
         }
+
     }
 
     fun done() {
@@ -290,8 +299,8 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
             }
     }
 
-   suspend fun file() {
+    suspend fun file() {
         val file = File("")
-        val resp = BmobMethods.INSTANCE.postFile("test.jpg",file.asRequestBody())
+        val resp = BmobMethods.INSTANCE.postFile("test.jpg", file.asRequestBody())
     }
 }
