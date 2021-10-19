@@ -2,14 +2,16 @@ package com.junerver.cloudnote
 
 import android.app.Application
 import android.content.Context
+import androidx.multidex.MultiDex
+import com.elvishew.xlog.LogConfiguration
 import com.elvishew.xlog.LogLevel
 import com.elvishew.xlog.XLog
+import com.elvishew.xlog.printer.AndroidPrinter
+import com.elvishew.xlog.printer.Printer
 import com.tencent.mmkv.MMKV
-import com.elvishew.xlog.LogConfiguration
 import com.umeng.analytics.MobclickAgent
 import com.umeng.commonsdk.UMConfigure
 import org.litepal.LitePal
-import androidx.multidex.MultiDex
 
 class CloudNoteApp : Application() {
 
@@ -40,10 +42,11 @@ class CloudNoteApp : Application() {
             .enableStackTrace(2) // 允许打印深度为 2 的调用栈信息，默认禁止
             .enableBorder() // 允许打印日志边框，默认禁止
             .build()
-
+        val androidPrinter: Printer = AndroidPrinter(true)
         XLog.init(
             // 初始化 XLog
             config,  // 指定日志配置，如果不指定，会默认使用 new LogConfiguration.Builder().build()
+            androidPrinter
         )
     }
 
