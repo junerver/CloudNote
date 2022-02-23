@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.junit.Assert
 import org.junit.Test
@@ -78,6 +79,8 @@ class ExampleUnitTest {
 
     @Test
     fun testFlow() = runBlocking {
+
+        withTimeoutOrNull(200){}
 
         flow<String> {
             val map = mapOf("userObjId" to "testw")

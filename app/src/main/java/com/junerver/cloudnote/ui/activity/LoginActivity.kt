@@ -47,23 +47,25 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
             } else {
                 showProgress()
                 launch {
-                    fetchNetwork({
-                        BmobMethods.INSTANCE.login(mLoginUsername, mLoginPassword)
-                    }, { result ->
-                        XLog.d(result)
-                        closeProgress()
-                        val userInfo = result.toBean<UserInfoResp>()
-                        SpUtils.encode(Constants.SP_USER_INFO, userInfo.toJson())
-                        SpUtils.encode(Constants.SP_USER_ID,userInfo.objectId)
-                        startActivity(Intent(mContext, MainActivity::class.java))
-                        finish()
-                    }, {errorBody, errorMsg, code ->
-                        closeProgress()
-                        errorBody?.let {
-                            val bean = it.toBean<ErrorResp>()
-                            showLongToast(errorMsg+bean.error)
+                    fetchNetwork {
+                        doNetwork { BmobMethods.INSTANCE.login(mLoginUsername, mLoginPassword) }
+                        onSuccess { result ->
+                            XLog.d(result)
+                            closeProgress()
+                            val userInfo = result.toBean<UserInfoResp>()
+                            SpUtils.encode(Constants.SP_USER_INFO, userInfo.toJson())
+                            SpUtils.encode(Constants.SP_USER_ID, userInfo.objectId)
+                            startActivity(Intent(mContext, MainActivity::class.java))
+                            finish()
                         }
-                    })
+                        onHttpError { errorBody, errorMsg, code ->
+                            closeProgress()
+                            errorBody?.let {
+                                val bean = it.toBean<ErrorResp>()
+                                showLongToast(errorMsg + bean.error)
+                            }
+                        }
+                    }
                 }
             }
         }

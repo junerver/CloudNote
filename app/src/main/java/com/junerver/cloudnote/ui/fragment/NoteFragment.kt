@@ -75,30 +75,34 @@ class NoteFragment : BaseFragment() {
                 if (NetUtils.isConnected(mContext)) {
                     lifecycleScope.launch {
                         //云端删除
-                        fetchNetwork({
-                            BmobMethods.INSTANCE.delNoteById(item.objId)
-                        }, {
-                            val delResp = it.toBean<DelResp>()
-                            //本地删除
-                            item.delete()
-                            listAllFromDb()
-                        }, { errorBody, errorMsg, code ->
-                            errorBody?.let {
-                                val bean = it.toBean<ErrorResp>()
-                                if (code == 101) {
-                                    //云端没有该对象
-                                    item.delete()
-                                } else {
-                                    item.isLocalDel = true
-                                    item.saveOrUpdate("objId = ?",item.objId)
-                                }
+                        fetchNetwork {
+                            doNetwork {
+                                BmobMethods.INSTANCE.delNoteById(item.objId)
+                            }
+                            onSuccess {
+                                val delResp = it.toBean<DelResp>()
+                                //本地删除
+                                item.delete()
                                 listAllFromDb()
                             }
-                        })
+                            onHttpError { errorBody, errorMsg, code ->
+                                errorBody?.let {
+                                    val bean = it.toBean<ErrorResp>()
+                                    if (code == 101) {
+                                        //云端没有该对象
+                                        item.delete()
+                                    } else {
+                                        item.isLocalDel = true
+                                        item.saveOrUpdate("objId = ?", item.objId)
+                                    }
+                                    listAllFromDb()
+                                }
+                            }
+                        }
                     }
                 } else {
                     item.isLocalDel = true
-                    item.saveOrUpdate("objId = ?",item.objId)
+                    item.saveOrUpdate("objId = ?", item.objId)
                     listAllFromDb()
                 }
             }

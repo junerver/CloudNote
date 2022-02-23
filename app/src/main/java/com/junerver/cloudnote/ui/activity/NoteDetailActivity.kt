@@ -55,7 +55,7 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
         if (content.isNotEmpty()) {
             viewBinding.tvNoteContent.text = content
         }
-        if (image.isNotEmpty()) {
+        if (image.isNullOrEmpty()) {
             var bitmap: Bitmap = BitmapFactory.decodeFile(image)
             bitmap = ThumbnailUtils.extractThumbnail(
                 bitmap,
@@ -66,7 +66,10 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
             viewBinding.ivImage.setImageBitmap(bitmap)
         }
         if (video.isNotEmpty()) {
-            var bitmap: Bitmap = ThumbnailUtils.createVideoThumbnail(video, MediaStore.Images.Thumbnails.MICRO_KIND)!!
+            var bitmap: Bitmap = ThumbnailUtils.createVideoThumbnail(
+                video,
+                MediaStore.Images.Thumbnails.MICRO_KIND
+            )!!
             bitmap = ThumbnailUtils.extractThumbnail(
                 bitmap,
                 Math.max(500, viewBinding.ibVideo.width),
@@ -83,28 +86,33 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
             editIntent.putExtra("Note", mNote)
             startActivityForResult(editIntent, EDIT_NOTE)
         }
-        viewBinding.btnDelete.setOnClickListener{
+        viewBinding.btnDelete.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(mContext)
             builder.setTitle("确认要删除这个笔记么？")
-            builder.setPositiveButton("确认"
+            builder.setPositiveButton(
+                "确认"
             ) { _, _ ->
                 if (NetUtils.isConnected(mContext)) {
                     lifecycleScope.launch {
                         //云端删除
-                        fetchNetwork({
-                            BmobMethods.INSTANCE.delNoteById(mNote.objId)
-                        }, {
-                            val delResp = it.toBean<DelResp>()
-                            //本地删除
-                            NoteUtils.delNoteById(mNote.objId)
-                            showShortToast(getString(R.string.del_success))
-                            finish()
-                        }, { errorBody, errorMsg, code ->
-                            errorBody?.let {
-                                val bean = it.toBean<ErrorResp>()
-                                delInLocalWithoutNetWork()
+                        fetchNetwork {
+                            doNetwork {
+                                BmobMethods.INSTANCE.delNoteById(mNote.objId)
                             }
-                        })
+                            onSuccess {
+                                val delResp = it.toBean<DelResp>()
+                                //本地删除
+                                NoteUtils.delNoteById(mNote.objId)
+                                showShortToast(getString(R.string.del_success))
+                                finish()
+                            }
+                            onHttpError { errorBody, errorMsg, code ->
+                                errorBody?.let {
+                                    val bean = it.toBean<ErrorResp>()
+                                    delInLocalWithoutNetWork()
+                                }
+                            }
+                        }
                     }
                 } else {
                     delInLocalWithoutNetWork()
@@ -116,9 +124,9 @@ class NoteDetailActivity : BaseActivity<ActivityNoteDetailBinding>() {
         backBarBinding.ivBack.setOnClickListener { finish() }
     }
 
-    fun delInLocalWithoutNetWork() {
+    private fun delInLocalWithoutNetWork() {
         mNote.isLocalDel = true
-        mNote.saveOrUpdate("objId = ?",mNote.objId)
+        mNote.saveOrUpdate("objId = ?", mNote.objId)
         showShortToast(getString(R.string.del_success))
         finish()
     }

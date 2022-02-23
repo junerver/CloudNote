@@ -143,50 +143,58 @@ class EditNoteActivity : BaseActivity<ActivityEditNoteBinding>() {
                 launch {
                     if (isNew) {
                         //新建笔记 post 提交
-                        fetchNetwork({
-                            BmobMethods.INSTANCE.postNote(
-                                noteEntity.toBmob()
-                                    .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
-                                    .createJsonRequestBody()
-                            )
-                        }, {
-                            closeProgress()
-                            val postResp = it.toBean<PostResp>()
-                            isNew = false
-                            noteEntity.isSync = true
-                            noteEntity.objId = postResp.objectId
-                            noteEntity.save()
-                            showShortToast("保存成功！")
-                        }, { errorBody, errorMsg, code ->
-                            closeProgress()
-                            errorBody?.let {
-                                val bean = it.toBean<ErrorResp>()
-                                XLog.d(errorMsg + bean.error)
-                                showLongToast(errorMsg + bean.error)
+                        fetchNetwork {
+                            doNetwork {
+                                BmobMethods.INSTANCE.postNote(
+                                    noteEntity.toBmob()
+                                        .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
+                                        .createJsonRequestBody()
+                                )
                             }
-                        })
+                            onSuccess {
+                                closeProgress()
+                                val postResp = it.toBean<PostResp>()
+                                isNew = false
+                                noteEntity.isSync = true
+                                noteEntity.objId = postResp.objectId
+                                noteEntity.save()
+                                showShortToast("保存成功！")
+                            }
+                            onHttpError { errorBody, errorMsg, code ->
+                                closeProgress()
+                                errorBody?.let {
+                                    val bean = it.toBean<ErrorResp>()
+                                    XLog.d(errorMsg + bean.error)
+                                    showLongToast(errorMsg + bean.error)
+                                }
+                            }
+                        }
                     } else {
                         //更新
-                        fetchNetwork({
-                            BmobMethods.INSTANCE.putNoteById(
-                                noteEntity.objId,
-                                noteEntity.toBmob()
-                                    .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
-                                    .createJsonRequestBody()
-                            )
-                        }, {
-                            closeProgress()
-                            val putResp = it.toBean<PutResp>()
-                            noteEntity.isSync = true
-                            noteEntity.save()
-                            showShortToast("保存成功！")
-                        }, { errorBody, errorMsg, code ->
-                            closeProgress()
-                            errorBody?.let {
-                                val bean = it.toBean<ErrorResp>()
-                                showLongToast(errorMsg + bean.error)
+                        fetchNetwork {
+                            doNetwork {
+                                BmobMethods.INSTANCE.putNoteById(
+                                    noteEntity.objId,
+                                    noteEntity.toBmob()
+                                        .toJson(excludeFields = Constants.DEFAULT_EXCLUDE_FIELDS)
+                                        .createJsonRequestBody()
+                                )
                             }
-                        })
+                            onSuccess {
+                                closeProgress()
+                                val putResp = it.toBean<PutResp>()
+                                noteEntity.isSync = true
+                                noteEntity.save()
+                                showShortToast("保存成功！")
+                            }
+                            onHttpError { errorBody, errorMsg, code ->
+                                closeProgress()
+                                errorBody?.let {
+                                    val bean = it.toBean<ErrorResp>()
+                                    showLongToast(errorMsg + bean.error)
+                                }
+                            }
+                        }
                     }
                 }
             } else {

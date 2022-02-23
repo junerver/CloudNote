@@ -375,7 +375,14 @@ fun TextView.stringTrim(): String {
  * @param transformation
  * @return
  */
-fun ImageView.load(url: Any, @DrawableRes resourceId: Int? = null, isCircle: Boolean = false, width :Int = -1, height:Int = -1, vararg transformation: Transformation<Bitmap>) {
+fun ImageView.load(
+    url: Any,
+    @DrawableRes resourceId: Int? = null,
+    isCircle: Boolean = false,
+    width: Int = -1,
+    height: Int = -1,
+    vararg transformation: Transformation<Bitmap>
+) {
     val option = RequestOptions()
     option.apply {
         if (transformation.isNotEmpty()) {
@@ -389,8 +396,8 @@ fun ImageView.load(url: Any, @DrawableRes resourceId: Int? = null, isCircle: Boo
         if (isCircle) {
             circleCrop()
         }
-        if (width!=-1 && height!=-1) {
-            override(width,height)
+        if (width != -1 && height != -1) {
+            override(width, height)
         }
 //                skipMemoryCache(true)
 //                diskCacheStrategy(DiskCacheStrategy.NONE)
@@ -510,6 +517,32 @@ inline fun <reified T> String.toBean(
 inline fun String.createJsonRequestBody(): RequestBody =
     this.toRequestBody("Content-Type, application/json".toMediaTypeOrNull())
 
+
+interface DoNetworkInterface {
+    fun doNetwork(doNetwork: suspend CoroutineScope. () -> String)
+    fun onSuccess(onSuccess: (result: String) -> Unit = {})
+    fun onHttpError(onHttpError: (errorBody: String?, errorMsg: String, code: Int?) -> Unit)
+}
+
+class DoNetworkInterfaceImpl : DoNetworkInterface {
+    var doNetwork: (suspend CoroutineScope. () -> String)? = null
+    var onSuccess: ((result: String) -> Unit)? = null
+    var onHttpError: ((errorBody: String?, errorMsg: String, code: Int?) -> Unit)? = null
+
+    override fun doNetwork(doNetwork: suspend CoroutineScope.() -> String) {
+        this.doNetwork = doNetwork
+    }
+
+    override fun onSuccess(onSuccess: (result: String) -> Unit) {
+        this.onSuccess = onSuccess
+    }
+
+    override fun onHttpError(onHttpError: (errorBody: String?, errorMsg: String, code: Int?) -> Unit) {
+        this.onHttpError = onHttpError
+    }
+
+}
+
 /**
  * @Description 针对retrofit挂起函数的封装，内部封装好了协程的切换与错误处理
  * @Author Junerver
@@ -519,11 +552,12 @@ inline fun String.createJsonRequestBody(): RequestBody =
  * @param onHttpError 出现httperror的回调 会取出code 与 body
  * @return
  */
-suspend fun fetchNetwork(
-    doNetwork: suspend CoroutineScope. () -> String,
-    onSuccess: (result: String) -> Unit,
-    onHttpError: (errorBody: String?, errorMsg: String, code: Int?) -> Unit
+private suspend fun fetchNetwork(
+    doNetwork: (suspend CoroutineScope. () -> String)?,
+    onSuccess: ((result: String) -> Unit?)?,
+    onHttpError: ((errorBody: String?, errorMsg: String, code: Int?) -> Unit)?
 ) {
+    require(doNetwork != null)
     try {
         //该函数集成父协程的CoroutineScope
         coroutineScope {
@@ -531,10 +565,10 @@ suspend fun fetchNetwork(
             val result = network.await()
             launch(Dispatchers.Main) {
                 if (result.contains("error") && result.contains("code")) {
-                    onHttpError(result, "", 200)
+                    onHttpError?.invoke(result, "", 200)
                     return@launch
                 } else {
-                    onSuccess(result)
+                    onSuccess?.invoke(result)
                 }
             }
         }
@@ -567,12 +601,22 @@ suspend fun fetchNetwork(
             is UnknownHostException -> "网络链接失败"
             else -> e.message ?: "未知错误"
         }
-        onHttpError(errorBody, errorMsg, code)
+        onHttpError?.invoke(errorBody, errorMsg, code)
     }
 }
 
+suspend fun fetchNetwork(init: DoNetworkInterface.() -> Unit) {
+    val network = DoNetworkInterfaceImpl()
+    network.init()
+    require(network.doNetwork != null)
+    network.apply {
+        fetchNetwork(doNetwork, onSuccess, onHttpError)
+    }
+}
+
+
 fun String.urlEncode(): String {
-    val encode:String = URLEncoder.encode(this, "utf-8")
+    val encode: String = URLEncoder.encode(this, "utf-8")
     return encode.replace("%3A", ":").replace("%2F", "/")
 }
 

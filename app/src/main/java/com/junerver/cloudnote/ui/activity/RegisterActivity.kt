@@ -47,25 +47,32 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
             } else {
                 showProgress()
                 launch {
-                    fetchNetwork({
-                        val map = mapOf("username" to mRegisterUsername, "password" to mRegisterPassword)
-                        BmobMethods.INSTANCE.register(map.toJson().createJsonRequestBody())
-                    },{resp->
-                        closeProgress()
-                        val userInfo = resp.toBean<UserInfoResp>()
-                        userInfo.username = mRegisterUsername
-                        SpUtils.encode(Constants.SP_USER_INFO, userInfo.toJson())
-                        SpUtils.encode(Constants.SP_USER_ID,userInfo.objectId)
-                        showShortToast(getString(R.string.register_success))
-                        startActivity(Intent(mContext, MainActivity::class.java))
-                        finish()
-                    },{errorBody, errorMsg, code ->
-                        closeProgress()
-                        errorBody?.let {
-                            val bean = it.toBean<ErrorResp>()
-                            showLongToast(errorMsg+bean.error)
+                    fetchNetwork {
+                        doNetwork {
+                            val map = mapOf(
+                                "username" to mRegisterUsername,
+                                "password" to mRegisterPassword
+                            )
+                            BmobMethods.INSTANCE.register(map.toJson().createJsonRequestBody())
                         }
-                    })
+                        onSuccess { resp ->
+                            closeProgress()
+                            val userInfo = resp.toBean<UserInfoResp>()
+                            userInfo.username = mRegisterUsername
+                            SpUtils.encode(Constants.SP_USER_INFO, userInfo.toJson())
+                            SpUtils.encode(Constants.SP_USER_ID, userInfo.objectId)
+                            showShortToast(getString(R.string.register_success))
+                            startActivity(Intent(mContext, MainActivity::class.java))
+                            finish()
+                        }
+                        onHttpError { errorBody, errorMsg, code ->
+                            closeProgress()
+                            errorBody?.let {
+                                val bean = it.toBean<ErrorResp>()
+                                showLongToast(errorMsg + bean.error)
+                            }
+                        }
+                    }
                 }
             }
         }
